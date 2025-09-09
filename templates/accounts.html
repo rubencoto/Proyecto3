@@ -1,0 +1,622 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Cuentas - Banking MVP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-credit-card me-2"></i>Gestión de Cuentas</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#accountModal">
+                <i class="fas fa-plus me-1"></i>Nueva Cuenta
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="total-active-accounts">-</h4>
+                        <p class="mb-0">Cuentas Activas</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="total-balance-summary">-</h4>
+                        <p class="mb-0">Balance Total</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-coins fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="crc-accounts">-</h4>
+                        <p class="mb-0">Cuentas CRC</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-flag fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 id="usd-accounts">-</h4>
+                        <p class="mb-0">Cuentas USD</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" class="form-control" id="search-accounts" placeholder="Buscar cuentas...">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" id="filter-currency">
+            <option value="">Todas las monedas</option>
+            <option value="CRC">CRC</option>
+            <option value="USD">USD</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="ACTIVE">Activas</option>
+            <option value="BLOCKED">Bloqueadas</option>
+            <option value="CLOSED">Cerradas</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-secondary w-100" onclick="refreshAccounts()">
+            <i class="fas fa-sync-alt me-1"></i>Actualizar
+        </button>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-info w-100" onclick="generateTrialBalance()">
+            <i class="fas fa-file-excel me-1"></i>Trial Balance
+        </button>
+    </div>
+</div>
+
+<!-- Accounts Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>Lista de Cuentas</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Número de Cuenta</th>
+                        <th>Cliente</th>
+                        <th>Moneda</th>
+                        <th>Balance</th>
+                        <th>Estado</th>
+                        <th>Límite Diario</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="accounts-table-body">
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Nueva Cuenta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="account-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="customer-select" class="form-label">Cliente *</label>
+                                <select class="form-select" id="customer-select" required>
+                                    <option value="">Seleccionar cliente...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="currency-select" class="form-label">Moneda *</label>
+                                <select class="form-select" id="currency-select" required>
+                                    <option value="">Seleccionar moneda...</option>
+                                    <option value="CRC">Colones (CRC)</option>
+                                    <option value="USD">Dólares (USD)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="daily-limit" class="form-label">Límite Diario</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" id="currency-symbol">?</span>
+                                    <input type="number" class="form-control" id="daily-limit" value="1000000" step="0.01" min="0">
+                                </div>
+                                <div class="form-text">Límite por defecto: ?1,000,000 / $5,000</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Información</label>
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <small>
+                                        • La cuenta se creará con balance inicial de 0<br>
+                                        • El número de cuenta se genera automáticamente<br>
+                                        • Estado inicial: ACTIVA
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="createAccount()">
+                    <i class="fas fa-save me-1"></i>Crear Cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Details Modal -->
+<div class="modal fade" id="accountDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-credit-card me-2"></i>Detalles de Cuenta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="account-details-body">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-info" onclick="viewAccountStatement()">
+                    <i class="fas fa-file-alt me-1"></i>Estado de Cuenta
+                </button>
+                <button type="button" class="btn btn-primary" onclick="makeTransaction()">
+                    <i class="fas fa-exchange-alt me-1"></i>Nueva Transacción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentAccounts = [];
+let currentCustomers = [];
+let selectedAccountId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadAccountsData();
+    
+    // Setup search and filter functionality
+    document.getElementById('search-accounts').addEventListener('input', filterAccounts);
+    document.getElementById('filter-currency').addEventListener('change', filterAccounts);
+    document.getElementById('filter-status').addEventListener('change', filterAccounts);
+    
+    // Setup currency change handler
+    document.getElementById('currency-select').addEventListener('change', updateCurrencySymbol);
+    
+    // Check for pre-selected customer from URL
+    const preSelectedCustomer = getUrlParameter('customer_id');
+    if (preSelectedCustomer) {
+        // Open modal and pre-select customer
+        setTimeout(() => {
+            const modal = new bootstrap.Modal(document.getElementById('accountModal'));
+            modal.show();
+            document.getElementById('customer-select').value = preSelectedCustomer;
+        }, 1000);
+    }
+});
+
+async function loadAccountsData() {
+    try {
+        // Load accounts and customers in parallel
+        const [accountsResponse, customersResponse] = await Promise.all([
+            fetch('/accounts'),
+            fetch('/customers')
+        ]);
+        
+        if (!accountsResponse.ok || !customersResponse.ok) {
+            throw new Error('Error loading data');
+        }
+        
+        currentAccounts = await accountsResponse.json();
+        currentCustomers = await customersResponse.json();
+        
+        displayAccounts(currentAccounts);
+        updateAccountsSummary();
+        populateCustomerSelect();
+        
+    } catch (error) {
+        console.error('Error loading accounts data:', error);
+        showToast('Error cargando datos de cuentas', 'error');
+        document.getElementById('accounts-table-body').innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Error cargando datos de cuentas
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function displayAccounts(accounts) {
+    const tbody = document.getElementById('accounts-table-body');
+    
+    if (accounts.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-4">
+                    <i class="fas fa-info-circle text-muted me-1"></i>
+                    No hay cuentas registradas
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = accounts.map(account => {
+        const customer = currentCustomers.find(c => c.id === account.customer_id);
+        const customerName = customer ? `${customer.first_name} ${customer.last_name}` : 'N/A';
+        
+        return `
+            <tr>
+                <td>${account.id}</td>
+                <td><code>${formatAccountNumber(account.account_number)}</code></td>
+                <td>${customerName}</td>
+                <td>
+                    <span class="badge bg-${account.currency === 'CRC' ? 'primary' : 'warning'}">
+                        ${account.currency}
+                    </span>
+                </td>
+                <td class="text-end">
+                    <strong>${formatCurrency(account.balance, account.currency)}</strong>
+                </td>
+                <td>${getAccountStatusBadge(account.status)}</td>
+                <td class="text-end">${formatCurrency(account.daily_limit, account.currency)}</td>
+                <td>${formatDate(account.created_at)}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewAccountDetails(${account.id})" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="makeTransactionForAccount(${account.id})" title="Nueva transacción">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="viewAccountStatement(${account.id})" title="Estado de cuenta">
+                            <i class="fas fa-file-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateAccountsSummary() {
+    const activeAccounts = currentAccounts.filter(acc => acc.status === 'ACTIVE');
+    const crcAccounts = currentAccounts.filter(acc => acc.currency === 'CRC');
+    const usdAccounts = currentAccounts.filter(acc => acc.currency === 'USD');
+    
+    const totalBalanceCRC = crcAccounts.reduce((sum, acc) => sum + parseFloat(acc.balance), 0);
+    const totalBalanceUSD = usdAccounts.reduce((sum, acc) => sum + parseFloat(acc.balance), 0);
+    
+    document.getElementById('total-active-accounts').textContent = activeAccounts.length;
+    document.getElementById('crc-accounts').textContent = crcAccounts.length;
+    document.getElementById('usd-accounts').textContent = usdAccounts.length;
+    
+    // Show combined balance or primary currency
+    if (totalBalanceCRC > 0 && totalBalanceUSD > 0) {
+        document.getElementById('total-balance-summary').innerHTML = `
+            ?${totalBalanceCRC.toLocaleString()}<br>
+            <small>$${totalBalanceUSD.toLocaleString()}</small>
+        `;
+    } else if (totalBalanceCRC > 0) {
+        document.getElementById('total-balance-summary').textContent = `?${totalBalanceCRC.toLocaleString()}`;
+    } else if (totalBalanceUSD > 0) {
+        document.getElementById('total-balance-summary').textContent = `$${totalBalanceUSD.toLocaleString()}`;
+    } else {
+        document.getElementById('total-balance-summary').textContent = '?0';
+    }
+}
+
+function populateCustomerSelect() {
+    const select = document.getElementById('customer-select');
+    select.innerHTML = '<option value="">Seleccionar cliente...</option>';
+    
+    currentCustomers
+        .filter(customer => !customer.is_sanction_listed) // Only non-sanctioned customers
+        .forEach(customer => {
+            select.innerHTML += `
+                <option value="${customer.id}">
+                    ${customer.first_name} ${customer.last_name} (${customer.document_id})
+                </option>
+            `;
+        });
+}
+
+function filterAccounts() {
+    const searchTerm = document.getElementById('search-accounts').value.toLowerCase();
+    const currencyFilter = document.getElementById('filter-currency').value;
+    const statusFilter = document.getElementById('filter-status').value;
+    
+    let filteredAccounts = currentAccounts.filter(account => {
+        const customer = currentCustomers.find(c => c.id === account.customer_id);
+        const customerName = customer ? `${customer.first_name} ${customer.last_name}`.toLowerCase() : '';
+        
+        const matchesSearch = 
+            account.account_number.toLowerCase().includes(searchTerm) ||
+            customerName.includes(searchTerm) ||
+            account.id.toString().includes(searchTerm);
+        
+        const matchesCurrency = currencyFilter === '' || account.currency === currencyFilter;
+        const matchesStatus = statusFilter === '' || account.status === statusFilter;
+        
+        return matchesSearch && matchesCurrency && matchesStatus;
+    });
+    
+    displayAccounts(filteredAccounts);
+}
+
+function updateCurrencySymbol() {
+    const currency = document.getElementById('currency-select').value;
+    const symbol = document.getElementById('currency-symbol');
+    const dailyLimit = document.getElementById('daily-limit');
+    
+    if (currency === 'USD') {
+        symbol.textContent = '$';
+        dailyLimit.value = '5000';
+    } else {
+        symbol.textContent = '?';
+        dailyLimit.value = '1000000';
+    }
+}
+
+async function createAccount() {
+    const customerId = document.getElementById('customer-select').value;
+    const currency = document.getElementById('currency-select').value;
+    const dailyLimit = document.getElementById('daily-limit').value;
+    
+    if (!customerId || !currency) {
+        showToast('Por favor complete todos los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!validateAmount(dailyLimit)) {
+        showToast('Por favor ingrese un límite diario válido', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/accounts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                customer_id: parseInt(customerId),
+                currency: currency,
+                daily_limit: parseFloat(dailyLimit)
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('accountModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('account-form').reset();
+            updateCurrencySymbol();
+            
+            showToast('Cuenta creada exitosamente', 'success');
+            loadAccountsData(); // Reload the data
+        } else {
+            showToast(result.detail || 'Error creando cuenta', 'error');
+        }
+    } catch (error) {
+        console.error('Error creating account:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+async function viewAccountDetails(accountId) {
+    selectedAccountId = accountId;
+    const account = currentAccounts.find(a => a.id === accountId);
+    const customer = currentCustomers.find(c => c.id === account.customer_id);
+    
+    if (!account || !customer) {
+        showToast('Cuenta no encontrada', 'error');
+        return;
+    }
+    
+    try {
+        // Get recent transactions
+        const response = await fetch(`/accounts/${accountId}/statement?limit=10`);
+        const statement = await response.json();
+        
+        const detailsBody = document.getElementById('account-details-body');
+        detailsBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Información de la Cuenta</h6>
+                    <table class="table table-sm">
+                        <tr><td><strong>Número de Cuenta:</strong></td><td><code>${formatAccountNumber(account.account_number)}</code></td></tr>
+                        <tr><td><strong>Titular:</strong></td><td>${customer.first_name} ${customer.last_name}</td></tr>
+                        <tr><td><strong>Documento:</strong></td><td>${customer.document_id}</td></tr>
+                        <tr><td><strong>Moneda:</strong></td><td>${account.currency}</td></tr>
+                        <tr><td><strong>Balance Actual:</strong></td><td><strong>${formatCurrency(account.balance, account.currency)}</strong></td></tr>
+                        <tr><td><strong>Estado:</strong></td><td>${getAccountStatusBadge(account.status)}</td></tr>
+                        <tr><td><strong>Límite Diario:</strong></td><td>${formatCurrency(account.daily_limit, account.currency)}</td></tr>
+                        <tr><td><strong>Fecha Creación:</strong></td><td>${formatDate(account.created_at)}</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Transacciones Recientes</h6>
+                    ${statement.transactions.length > 0 ? `
+                        <div class="list-group">
+                            ${statement.transactions.slice(0, 5).map(tx => `
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            ${getTransactionTypeIcon(tx.transaction_type)}
+                                            <strong>${getTransactionTypeName(tx.transaction_type)}</strong>
+                                            <br>
+                                            <small class="text-muted">${tx.description || 'Sin descripción'}</small>
+                                            <br>
+                                            <small class="text-muted">${formatDate(tx.created_at)}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <strong class="${tx.transaction_type === 'DEPOSIT' ? 'text-success' : 'text-danger'}">
+                                                ${tx.transaction_type === 'DEPOSIT' ? '+' : '-'}${formatCurrency(tx.amount, account.currency)}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${statement.transactions.length > 5 ? 
+                            `<div class="text-center mt-2">
+                                <small class="text-muted">Y ${statement.transactions.length - 5} transacciones más...</small>
+                            </div>` : ''
+                        }
+                    ` : '<p class="text-muted">No hay transacciones registradas</p>'}
+                </div>
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('accountDetailsModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error loading account details:', error);
+        showToast('Error cargando detalles de la cuenta', 'error');
+    }
+}
+
+function makeTransaction() {
+    if (!selectedAccountId) {
+        showToast('Seleccione una cuenta', 'error');
+        return;
+    }
+    
+    makeTransactionForAccount(selectedAccountId);
+}
+
+function makeTransactionForAccount(accountId) {
+    // Close current modal if open
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('accountDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    // Redirect to transactions page with account pre-selected
+    window.location.href = `/transactions-page?account_id=${accountId}`;
+}
+
+function viewAccountStatement(accountId = null) {
+    const targetAccountId = accountId || selectedAccountId;
+    if (!targetAccountId) {
+        showToast('Seleccione una cuenta', 'error');
+        return;
+    }
+    
+    // For now, just show an alert. In a full implementation, this would open a detailed statement view
+    showToast('Función de estado de cuenta detallado en desarrollo', 'info');
+}
+
+async function generateTrialBalance() {
+    try {
+        const response = await fetch('/reports/trial-balance?format=csv');
+        
+        if (response.ok) {
+            // Create download link
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trial_balance_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showToast('Trial Balance descargado exitosamente', 'success');
+        } else {
+            showToast('Error generando Trial Balance', 'error');
+        }
+    } catch (error) {
+        console.error('Error generating trial balance:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+function refreshAccounts() {
+    loadAccountsData();
+    showToast('Lista de cuentas actualizada', 'success');
+}
+</script>
+{% endblock %}

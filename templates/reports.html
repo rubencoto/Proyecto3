@@ -1,0 +1,741 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Banking MVP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-chart-bar me-2"></i>Reportes y Análisis</h1>
+            <button class="btn btn-outline-primary" onclick="refreshAllReports()">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar Todo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Report Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-balance-scale fa-3x text-primary mb-3"></i>
+                <h5>Trial Balance</h5>
+                <p class="text-muted">Balance de prueba contable</p>
+                <button class="btn btn-primary btn-sm" onclick="generateTrialBalance()">
+                    <i class="fas fa-download me-1"></i>Generar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-file-alt fa-3x text-success mb-3"></i>
+                <h5>Reporte SUGEF</h5>
+                <p class="text-muted">Reportería regulatoria</p>
+                <button class="btn btn-success btn-sm" onclick="generateRegulatoryReport('SUGEF')">
+                    <i class="fas fa-download me-1"></i>Generar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                <h5>Reporte IFRS</h5>
+                <p class="text-muted">Estándares internacionales</p>
+                <button class="btn btn-info btn-sm" onclick="generateRegulatoryReport('IFRS')">
+                    <i class="fas fa-download me-1"></i>Generar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                <h5>Alertas AML</h5>
+                <p class="text-muted">Monitoreo de riesgos</p>
+                <button class="btn btn-warning btn-sm" onclick="showAMLAlerts()">
+                    <i class="fas fa-eye me-1"></i>Ver Alertas
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Resumen Financiero</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="balanceChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="transactionChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Estadísticas Clave</h5>
+            </div>
+            <div class="card-body">
+                <div id="key-statistics">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trial Balance Report -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Trial Balance</h5>
+                    <div>
+                        <button class="btn btn-outline-success btn-sm me-2" onclick="downloadTrialBalance('json')">
+                            <i class="fas fa-file-code me-1"></i>JSON
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="downloadTrialBalance('csv')">
+                            <i class="fas fa-file-csv me-1"></i>CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="trial-balance-content">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando trial balance...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer and Account Analysis -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Análisis de Clientes</h5>
+            </div>
+            <div class="card-body">
+                <div id="customer-analysis">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Análisis de Cuentas</h5>
+            </div>
+            <div class="card-body">
+                <div id="account-analysis">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interest Calculator -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-percentage me-2"></i>Calculadora de Intereses Avanzada</h5>
+            </div>
+            <div class="card-body">
+                <form id="advanced-interest-form" class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="principal-amount" class="form-label">Monto Principal</label>
+                            <input type="number" class="form-control" id="principal-amount" 
+                                   step="0.01" min="0" placeholder="100000">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="annual-rate" class="form-label">Tasa Anual (%)</label>
+                            <input type="number" class="form-control" id="annual-rate" 
+                                   step="0.01" min="0" placeholder="5.0">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="time-period" class="form-label">Período (días)</label>
+                            <input type="number" class="form-control" id="time-period" 
+                                   min="1" max="365" placeholder="30">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-primary w-100" onclick="calculateAdvancedInterest()">
+                                <i class="fas fa-calculator me-1"></i>Calcular
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="interest-calculation-result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AML Alerts Modal -->
+<div class="modal fade" id="amlAlertsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>Alertas AML/ROS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="aml-alerts-content">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-warning" onclick="exportAMLAlerts()">
+                    <i class="fas fa-download me-1"></i>Exportar Alertas
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let balanceChart = null;
+let transactionChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadReportsData();
+    initializeCharts();
+});
+
+async function loadReportsData() {
+    try {
+        // Load all data in parallel
+        const [customersResponse, accountsResponse, trialBalanceResponse] = await Promise.all([
+            fetch('/customers'),
+            fetch('/accounts'),
+            fetch('/reports/trial-balance')
+        ]);
+        
+        const customers = await customersResponse.json();
+        const accounts = await accountsResponse.json();
+        const trialBalance = await trialBalanceResponse.json();
+        
+        updateKeyStatistics(customers, accounts, trialBalance);
+        updateTrialBalance(trialBalance);
+        updateCustomerAnalysis(customers);
+        updateAccountAnalysis(accounts);
+        updateCharts(accounts);
+        
+    } catch (error) {
+        console.error('Error loading reports data:', error);
+        showToast('Error cargando datos de reportes', 'error');
+    }
+}
+
+function updateKeyStatistics(customers, accounts, trialBalance) {
+    const activeCustomers = customers.filter(c => !c.is_sanction_listed).length;
+    const sanctionedCustomers = customers.filter(c => c.is_sanction_listed).length;
+    const activeAccounts = accounts.filter(a => a.status === 'ACTIVE').length;
+    const totalAccounts = accounts.length;
+    
+    document.getElementById('key-statistics').innerHTML = `
+        <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Total Clientes</span>
+                <strong>${customers.length}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Clientes Activos</span>
+                <strong class="text-success">${activeCustomers}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Clientes Sancionados</span>
+                <strong class="text-danger">${sanctionedCustomers}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Total Cuentas</span>
+                <strong>${totalAccounts}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Cuentas Activas</span>
+                <strong class="text-success">${activeAccounts}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Generado</span>
+                <small class="text-muted">${formatDate(new Date().toISOString())}</small>
+            </div>
+        </div>
+    `;
+}
+
+function updateTrialBalance(trialBalance) {
+    let content = `
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Resumen por Moneda</h6>
+                <table class="table table-sm">
+    `;
+    
+    for (const [currency, total] of Object.entries(trialBalance.balances_by_currency)) {
+        content += `
+            <tr>
+                <td><strong>${currency}</strong></td>
+                <td class="text-end">${formatCurrency(total, currency)}</td>
+            </tr>
+        `;
+    }
+    
+    content += `
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Información General</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td>Total de Cuentas</td>
+                        <td class="text-end"><strong>${trialBalance.total_accounts}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Fecha de Generación</td>
+                        <td class="text-end">${formatDate(trialBalance.generated_at)}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <h6>Detalle por Cuenta</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID Cuenta</th>
+                        <th>Número de Cuenta</th>
+                        <th>Moneda</th>
+                        <th class="text-end">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    trialBalance.accounts.forEach(account => {
+        content += `
+            <tr>
+                <td>${account.account_id}</td>
+                <td><code>${formatAccountNumber(account.account_number)}</code></td>
+                <td>
+                    <span class="badge bg-${account.currency === 'CRC' ? 'primary' : 'warning'}">
+                        ${account.currency}
+                    </span>
+                </td>
+                <td class="text-end">${formatCurrency(account.balance, account.currency)}</td>
+            </tr>
+        `;
+    });
+    
+    content += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('trial-balance-content').innerHTML = content;
+}
+
+function updateCustomerAnalysis(customers) {
+    const activeCustomers = customers.filter(c => !c.is_sanction_listed).length;
+    const sanctionedCustomers = customers.filter(c => c.is_sanction_listed).length;
+    const recentCustomers = customers.filter(c => {
+        const createdDate = new Date(c.created_at);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return createdDate > thirtyDaysAgo;
+    }).length;
+    
+    document.getElementById('customer-analysis').innerHTML = `
+        <div class="row text-center">
+            <div class="col-12 mb-3">
+                <h2 class="text-primary">${customers.length}</h2>
+                <p class="mb-0">Total de Clientes</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h4>${activeCustomers}</h4>
+                        <small>Activos</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h4>${sanctionedCustomers}</h4>
+                        <small>Sancionados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-1"></i>
+                <strong>${recentCustomers}</strong> clientes registrados en los últimos 30 días
+            </div>
+        </div>
+    `;
+}
+
+function updateAccountAnalysis(accounts) {
+    const crcAccounts = accounts.filter(a => a.currency === 'CRC').length;
+    const usdAccounts = accounts.filter(a => a.currency === 'USD').length;
+    const activeAccounts = accounts.filter(a => a.status === 'ACTIVE').length;
+    const blockedAccounts = accounts.filter(a => a.status === 'BLOCKED').length;
+    const closedAccounts = accounts.filter(a => a.status === 'CLOSED').length;
+    
+    document.getElementById('account-analysis').innerHTML = `
+        <div class="row text-center mb-3">
+            <div class="col-12">
+                <h2 class="text-success">${accounts.length}</h2>
+                <p class="mb-0">Total de Cuentas</p>
+            </div>
+        </div>
+        
+        <h6>Por Moneda</h6>
+        <div class="row mb-3">
+            <div class="col-6">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h4>${crcAccounts}</h4>
+                        <small>CRC</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <h4>${usdAccounts}</h4>
+                        <small>USD</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h6>Por Estado</h6>
+        <div class="list-group">
+            <div class="list-group-item d-flex justify-content-between">
+                <span><i class="fas fa-check-circle text-success me-1"></i>Activas</span>
+                <strong>${activeAccounts}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span><i class="fas fa-ban text-warning me-1"></i>Bloqueadas</span>
+                <strong>${blockedAccounts}</strong>
+            </div>
+            <div class="list-group-item d-flex justify-content-between">
+                <span><i class="fas fa-times-circle text-danger me-1"></i>Cerradas</span>
+                <strong>${closedAccounts}</strong>
+            </div>
+        </div>
+    `;
+}
+
+function initializeCharts() {
+    // Balance Chart (Pie)
+    const balanceCtx = document.getElementById('balanceChart').getContext('2d');
+    balanceChart = new Chart(balanceCtx, {
+        type: 'pie',
+        data: {
+            labels: ['CRC', 'USD'],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ['#007bff', '#ffc107'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribución de Balances'
+                }
+            }
+        }
+    });
+    
+    // Transaction Chart (Doughnut)
+    const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+    transactionChart = new Chart(transactionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Activas', 'Bloqueadas', 'Cerradas'],
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Estado de Cuentas'
+                }
+            }
+        }
+    });
+}
+
+function updateCharts(accounts) {
+    // Update balance chart
+    const crcBalance = accounts
+        .filter(a => a.currency === 'CRC')
+        .reduce((sum, a) => sum + parseFloat(a.balance), 0);
+    const usdBalance = accounts
+        .filter(a => a.currency === 'USD')
+        .reduce((sum, a) => sum + parseFloat(a.balance), 0);
+    
+    balanceChart.data.datasets[0].data = [crcBalance, usdBalance];
+    balanceChart.update();
+    
+    // Update transaction chart
+    const activeCount = accounts.filter(a => a.status === 'ACTIVE').length;
+    const blockedCount = accounts.filter(a => a.status === 'BLOCKED').length;
+    const closedCount = accounts.filter(a => a.status === 'CLOSED').length;
+    
+    transactionChart.data.datasets[0].data = [activeCount, blockedCount, closedCount];
+    transactionChart.update();
+}
+
+async function downloadTrialBalance(format) {
+    try {
+        const response = await fetch(`/reports/trial-balance?format=${format}`);
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trial_balance_${new Date().toISOString().split('T')[0]}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showToast(`Trial Balance descargado (${format.toUpperCase()})`, 'success');
+        } else {
+            showToast('Error descargando trial balance', 'error');
+        }
+    } catch (error) {
+        console.error('Error downloading trial balance:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+async function generateRegulatoryReport(type) {
+    try {
+        const response = await fetch(`/reports/regulatory?format=csv&report_type=${type}`);
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${type.toLowerCase()}_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showToast(`Reporte ${type} generado exitosamente`, 'success');
+        } else {
+            showToast(`Error generando reporte ${type}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error generating regulatory report:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+function showAMLAlerts() {
+    // Mock AML alerts data
+    const mockAlerts = [
+        {
+            id: 1,
+            account_id: 1,
+            amount: 15000000,
+            risk_level: 'HIGH',
+            message: 'Transacción por monto alto detectada',
+            created_at: new Date().toISOString()
+        },
+        {
+            id: 2,
+            account_id: 3,
+            amount: 12000000,
+            risk_level: 'HIGH',
+            message: 'Patrón de transacciones sospechoso',
+            created_at: new Date(Date.now() - 3600000).toISOString()
+        }
+    ];
+    
+    const alertsContent = document.getElementById('aml-alerts-content');
+    alertsContent.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-warning">
+                    <tr>
+                        <th>ID Alerta</th>
+                        <th>Cuenta</th>
+                        <th>Monto</th>
+                        <th>Nivel de Riesgo</th>
+                        <th>Mensaje</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${mockAlerts.map(alert => `
+                        <tr>
+                            <td>${alert.id}</td>
+                            <td>${alert.account_id}</td>
+                            <td>?${alert.amount.toLocaleString()}</td>
+                            <td>
+                                <span class="badge bg-danger">${alert.risk_level}</span>
+                            </td>
+                            <td>${alert.message}</td>
+                            <td>${formatDate(alert.created_at)}</td>
+                            <td>
+                                <span class="badge bg-warning">Pendiente</span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            <strong>Nota:</strong> Estas son alertas de demostración. En un sistema real, 
+            las alertas se generarían automáticamente basadas en reglas AML/ROS configuradas.
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('amlAlertsModal'));
+    modal.show();
+}
+
+async function calculateAdvancedInterest() {
+    const amount = document.getElementById('principal-amount').value;
+    const rate = document.getElementById('annual-rate').value;
+    const days = document.getElementById('time-period').value;
+    
+    if (!amount || !rate || !days) {
+        showToast('Complete todos los campos para el cálculo', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/interests/calc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: parseFloat(amount),
+                annual_rate: parseFloat(rate),
+                days: parseInt(days)
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('interest-calculation-result').innerHTML = `
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-calculator me-1"></i>Resultado del Cálculo</h6>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Monto Principal:</strong><br>
+                            ?${parseFloat(result.principal_amount).toLocaleString()}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Interés Bruto:</strong><br>
+                            ?${parseFloat(result.interest_earned).toLocaleString()}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Retención (8%):</strong><br>
+                            ?${parseFloat(result.tax_withheld).toLocaleString()}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Interés Neto:</strong><br>
+                            <span class="text-success h5">?${parseFloat(result.net_interest).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Cálculo basado en tasa anual del ${result.annual_rate}% por ${result.days} días.
+                        Retención según normativa fiscal de Costa Rica.
+                    </small>
+                </div>
+            `;
+        } else {
+            showToast('Error calculando intereses', 'error');
+        }
+    } catch (error) {
+        console.error('Error calculating interest:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+function refreshAllReports() {
+    loadReportsData();
+    showToast('Todos los reportes actualizados', 'success');
+}
+
+function exportAMLAlerts() {
+    // Mock function for exporting AML alerts
+    showToast('Función de exportación de alertas AML en desarrollo', 'info');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,799 @@
+{% extends "base.html" %}
+
+{% block title %}Pagos Externos - Banking MVP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-money-bill-wave me-2"></i>Pagos Externos</h1>
+            <div>
+                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#sinpeModal">
+                    <i class="fas fa-mobile-alt me-1"></i>SINPE
+                </button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#swiftModal">
+                    <i class="fas fa-globe me-1"></i>SWIFT
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Information Cards -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>SINPE - Sistema Nacional de Pagos Electrónicos</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Sistema de pagos instantáneos de Costa Rica. Permite transferencias inmediatas 
+                    entre cuentas bancarias usando únicamente el número de teléfono del beneficiario.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-1"></i> Transferencias instantáneas</li>
+                    <li><i class="fas fa-check text-success me-1"></i> 24/7 disponible</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Solo requiere número de teléfono</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Límites: hasta ?500,000 por transacción</li>
+                </ul>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#sinpeModal">
+                    <i class="fas fa-paper-plane me-1"></i>Realizar Pago SINPE
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-globe me-2"></i>SWIFT - Transferencias Internacionales</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Sistema global de mensajería financiera para transferencias internacionales. 
+                    Permite enviar dinero a cualquier banco en el mundo de forma segura.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-primary me-1"></i> Cobertura mundial</li>
+                    <li><i class="fas fa-check text-primary me-1"></i> Alta seguridad</li>
+                    <li><i class="fas fa-check text-primary me-1"></i> Trazabilidad completa</li>
+                    <li><i class="fas fa-check text-primary me-1"></i> Procesamiento 1-3 días hábiles</li>
+                </ul>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#swiftModal">
+                    <i class="fas fa-paper-plane me-1"></i>Realizar Pago SWIFT
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Payment Forms -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>SINPE Rápido</h6>
+            </div>
+            <div class="card-body">
+                <form id="quick-sinpe-form">
+                    <div class="mb-3">
+                        <label for="quick-sinpe-account" class="form-label">Cuenta Origen</label>
+                        <select class="form-select form-select-sm" id="quick-sinpe-account">
+                            <option value="">Seleccionar cuenta...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-sinpe-phone" class="form-label">Teléfono Destino</label>
+                        <input type="tel" class="form-control form-control-sm" id="quick-sinpe-phone" 
+                               placeholder="87654321" pattern="[0-9]{8}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-sinpe-amount" class="form-label">Monto</label>
+                        <input type="number" class="form-control form-control-sm" id="quick-sinpe-amount" 
+                               step="0.01" min="0" max="500000" placeholder="10000">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-sinpe-description" class="form-label">Descripción</label>
+                        <input type="text" class="form-control form-control-sm" id="quick-sinpe-description" 
+                               placeholder="Concepto del pago">
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm w-100" onclick="quickSinpePayment()">
+                        <i class="fas fa-paper-plane me-1"></i>Enviar SINPE
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-globe me-2"></i>SWIFT Rápido</h6>
+            </div>
+            <div class="card-body">
+                <form id="quick-swift-form">
+                    <div class="mb-3">
+                        <label for="quick-swift-account" class="form-label">Cuenta Origen</label>
+                        <select class="form-select form-select-sm" id="quick-swift-account">
+                            <option value="">Seleccionar cuenta...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-swift-bank" class="form-label">Banco Destino</label>
+                        <input type="text" class="form-control form-control-sm" id="quick-swift-bank" 
+                               placeholder="JP Morgan Chase Bank">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-swift-code" class="form-label">Código SWIFT</label>
+                        <input type="text" class="form-control form-control-sm" id="quick-swift-code" 
+                               placeholder="CHASUS33" pattern="[A-Z0-9]{8,11}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick-swift-amount" class="form-label">Monto (USD)</label>
+                        <input type="number" class="form-control form-control-sm" id="quick-swift-amount" 
+                               step="0.01" min="0" placeholder="1000">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm w-100" onclick="quickSwiftPayment()">
+                        <i class="fas fa-paper-plane me-1"></i>Enviar SWIFT
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Payments -->
+<div class="card mb-4">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Pagos Recientes</h5>
+            <button class="btn btn-outline-secondary btn-sm" onclick="refreshPayments()">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="recent-payments">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-3x mb-2"></i>
+                <h5>Completados</h5>
+                <h3 id="completed-payments">-</h3>
+                <small>Pagos exitosos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x mb-2"></i>
+                <h5>Pendientes</h5>
+                <h3 id="pending-payments">-</h3>
+                <small>En procesamiento</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-times-circle fa-3x mb-2"></i>
+                <h5>Fallidos</h5>
+                <h3 id="failed-payments">-</h3>
+                <small>Con errores</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SINPE Modal -->
+<div class="modal fade" id="sinpeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-mobile-alt me-2"></i>Pago SINPE</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sinpe-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="sinpe-account" class="form-label">Cuenta Origen *</label>
+                                <select class="form-select" id="sinpe-account" required>
+                                    <option value="">Seleccionar cuenta...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="sinpe-phone" class="form-label">Teléfono Destino *</label>
+                                <input type="tel" class="form-control" id="sinpe-phone" 
+                                       placeholder="87654321" pattern="[0-9]{8}" required>
+                                <div class="form-text">Formato: 87654321 (8 dígitos)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="sinpe-amount" class="form-label">Monto *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">?</span>
+                                    <input type="number" class="form-control" id="sinpe-amount" 
+                                           step="0.01" min="0" max="500000" required>
+                                </div>
+                                <div class="form-text">Límite máximo: ?500,000</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="sinpe-recipient-name" class="form-label">Nombre del Beneficiario</label>
+                                <input type="text" class="form-control" id="sinpe-recipient-name" 
+                                       placeholder="Nombre completo (opcional)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sinpe-description" class="form-label">Descripción del Pago</label>
+                        <textarea class="form-control" id="sinpe-description" rows="3" 
+                                  placeholder="Concepto o descripción del pago"></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <strong>SINPE:</strong> El pago se procesará instantáneamente y el beneficiario 
+                        recibirá una notificación en su teléfono móvil.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="processSinpePayment()">
+                    <i class="fas fa-paper-plane me-1"></i>Enviar Pago SINPE
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SWIFT Modal -->
+<div class="modal fade" id="swiftModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-globe me-2"></i>Transferencia SWIFT</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="swift-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-account" class="form-label">Cuenta Origen *</label>
+                                <select class="form-select" id="swift-account" required>
+                                    <option value="">Seleccionar cuenta...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-amount" class="form-label">Monto *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="swift-amount" 
+                                           step="0.01" min="0" required>
+                                </div>
+                                <div class="form-text">Moneda: USD únicamente</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-bank" class="form-label">Banco Beneficiario *</label>
+                                <input type="text" class="form-control" id="swift-bank" 
+                                       placeholder="JP Morgan Chase Bank" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-code" class="form-label">Código SWIFT/BIC *</label>
+                                <input type="text" class="form-control" id="swift-code" 
+                                       placeholder="CHASUS33" pattern="[A-Z0-9]{8,11}" required>
+                                <div class="form-text">8-11 caracteres alfanuméricos</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-account-number" class="form-label">Cuenta Beneficiario *</label>
+                                <input type="text" class="form-control" id="swift-account-number" 
+                                       placeholder="123456789012" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="swift-beneficiary-name" class="form-label">Nombre Beneficiario *</label>
+                                <input type="text" class="form-control" id="swift-beneficiary-name" 
+                                       placeholder="John Doe" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="swift-address" class="form-label">Dirección del Beneficiario</label>
+                        <textarea class="form-control" id="swift-address" rows="2" 
+                                  placeholder="Dirección completa del beneficiario"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="swift-description" class="form-label">Concepto del Pago *</label>
+                        <textarea class="form-control" id="swift-description" rows="3" 
+                                  placeholder="Describe el motivo de la transferencia" required></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>SWIFT:</strong> La transferencia será procesada en 1-3 días hábiles. 
+                        Se generará un número de referencia MT103 para seguimiento.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="processSwiftPayment()">
+                    <i class="fas fa-paper-plane me-1"></i>Enviar Transferencia SWIFT
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Result Modal -->
+<div class="modal fade" id="paymentResultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" id="result-modal-header">
+                <h5 class="modal-title" id="result-modal-title">Resultado del Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="result-modal-body">
+                <!-- Content will be set dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="printReceipt()" id="print-receipt-btn">
+                    <i class="fas fa-print me-1"></i>Imprimir Comprobante
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentAccounts = [];
+let lastPaymentResult = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPaymentsData();
+    updatePaymentStats();
+});
+
+async function loadPaymentsData() {
+    try {
+        const response = await fetch('/accounts');
+        if (!response.ok) {
+            throw new Error('Error loading accounts');
+        }
+        
+        currentAccounts = await response.json();
+        populateAccountSelects();
+        loadRecentPayments();
+        
+    } catch (error) {
+        console.error('Error loading payments data:', error);
+        showToast('Error cargando datos', 'error');
+    }
+}
+
+function populateAccountSelects() {
+    const selects = [
+        'quick-sinpe-account', 'quick-swift-account',
+        'sinpe-account', 'swift-account'
+    ];
+    
+    selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (select) {
+            select.innerHTML = '<option value="">Seleccionar cuenta...</option>';
+            
+            currentAccounts
+                .filter(account => account.status === 'ACTIVE')
+                .forEach(account => {
+                    // For SWIFT, only show USD accounts
+                    if (selectId.includes('swift') && account.currency !== 'USD') {
+                        return;
+                    }
+                    
+                    select.innerHTML += `
+                        <option value="${account.id}" data-currency="${account.currency}">
+                            ${formatAccountNumber(account.account_number)} - 
+                            ${formatCurrency(account.balance, account.currency)} 
+                            (${account.currency})
+                        </option>
+                    `;
+                });
+        }
+    });
+}
+
+async function quickSinpePayment() {
+    const accountId = document.getElementById('quick-sinpe-account').value;
+    const phone = document.getElementById('quick-sinpe-phone').value;
+    const amount = document.getElementById('quick-sinpe-amount').value;
+    const description = document.getElementById('quick-sinpe-description').value;
+    
+    if (!accountId || !phone || !amount) {
+        showToast('Complete los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!validatePhone(phone)) {
+        showToast('Ingrese un número de teléfono válido (8 dígitos)', 'error');
+        return;
+    }
+    
+    if (!validateAmount(amount) || parseFloat(amount) > 500000) {
+        showToast('Monto inválido. Límite máximo: ?500,000', 'error');
+        return;
+    }
+    
+    await processSinpePaymentAPI(accountId, phone, amount, description);
+    
+    // Reset form
+    document.getElementById('quick-sinpe-form').reset();
+}
+
+async function quickSwiftPayment() {
+    const accountId = document.getElementById('quick-swift-account').value;
+    const bank = document.getElementById('quick-swift-bank').value;
+    const swiftCode = document.getElementById('quick-swift-code').value;
+    const amount = document.getElementById('quick-swift-amount').value;
+    
+    if (!accountId || !bank || !swiftCode || !amount) {
+        showToast('Complete todos los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!validateAmount(amount)) {
+        showToast('Ingrese un monto válido', 'error');
+        return;
+    }
+    
+    if (!/^[A-Z0-9]{8,11}$/.test(swiftCode.toUpperCase())) {
+        showToast('Código SWIFT inválido (8-11 caracteres alfanuméricos)', 'error');
+        return;
+    }
+    
+    await processSwiftPaymentAPI(accountId, bank, swiftCode, 'Quick SWIFT Payment', amount, 'Anonymous', '');
+    
+    // Reset form
+    document.getElementById('quick-swift-form').reset();
+}
+
+async function processSinpePayment() {
+    const accountId = document.getElementById('sinpe-account').value;
+    const phone = document.getElementById('sinpe-phone').value;
+    const amount = document.getElementById('sinpe-amount').value;
+    const description = document.getElementById('sinpe-description').value;
+    
+    if (!accountId || !phone || !amount) {
+        showToast('Complete los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!validatePhone(phone)) {
+        showToast('Ingrese un número de teléfono válido (8 dígitos)', 'error');
+        return;
+    }
+    
+    if (!validateAmount(amount) || parseFloat(amount) > 500000) {
+        showToast('Monto inválido. Límite máximo: ?500,000', 'error');
+        return;
+    }
+    
+    await processSinpePaymentAPI(accountId, phone, amount, description);
+    
+    // Close modal and reset form
+    const modal = bootstrap.Modal.getInstance(document.getElementById('sinpeModal'));
+    modal.hide();
+    document.getElementById('sinpe-form').reset();
+}
+
+async function processSwiftPayment() {
+    const accountId = document.getElementById('swift-account').value;
+    const bank = document.getElementById('swift-bank').value;
+    const swiftCode = document.getElementById('swift-code').value;
+    const accountNumber = document.getElementById('swift-account-number').value;
+    const beneficiaryName = document.getElementById('swift-beneficiary-name').value;
+    const address = document.getElementById('swift-address').value;
+    const description = document.getElementById('swift-description').value;
+    const amount = document.getElementById('swift-amount').value;
+    
+    if (!accountId || !bank || !swiftCode || !accountNumber || !beneficiaryName || !description || !amount) {
+        showToast('Complete todos los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!validateAmount(amount)) {
+        showToast('Ingrese un monto válido', 'error');
+        return;
+    }
+    
+    if (!/^[A-Z0-9]{8,11}$/.test(swiftCode.toUpperCase())) {
+        showToast('Código SWIFT inválido (8-11 caracteres alfanuméricos)', 'error');
+        return;
+    }
+    
+    await processSwiftPaymentAPI(accountId, bank, swiftCode, description, amount, beneficiaryName, address);
+    
+    // Close modal and reset form
+    const modal = bootstrap.Modal.getInstance(document.getElementById('swiftModal'));
+    modal.hide();
+    document.getElementById('swift-form').reset();
+}
+
+async function processSinpePaymentAPI(accountId, phone, amount, description) {
+    try {
+        const response = await fetch('/payments/sinpe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                account_id: parseInt(accountId),
+                amount: parseFloat(amount),
+                recipient_phone: phone,
+                description: description || null
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            lastPaymentResult = { type: 'SINPE', ...result };
+            showPaymentResult(true, 'SINPE', result);
+            loadPaymentsData(); // Refresh account balances
+        } else {
+            showToast(result.detail || 'Error procesando pago SINPE', 'error');
+        }
+    } catch (error) {
+        console.error('Error processing SINPE payment:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+async function processSwiftPaymentAPI(accountId, bank, swiftCode, description, amount, beneficiaryName, address) {
+    try {
+        const response = await fetch('/payments/swift', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                account_id: parseInt(accountId),
+                amount: parseFloat(amount),
+                recipient_bank: bank,
+                recipient_account: document.getElementById('swift-account-number')?.value || 'N/A',
+                swift_code: swiftCode.toUpperCase(),
+                description: description
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            lastPaymentResult = { type: 'SWIFT', ...result };
+            showPaymentResult(true, 'SWIFT', result);
+            loadPaymentsData(); // Refresh account balances
+        } else {
+            showToast(result.detail || 'Error procesando transferencia SWIFT', 'error');
+        }
+    } catch (error) {
+        console.error('Error processing SWIFT payment:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+function showPaymentResult(success, type, result) {
+    const modal = document.getElementById('paymentResultModal');
+    const header = document.getElementById('result-modal-header');
+    const title = document.getElementById('result-modal-title');
+    const body = document.getElementById('result-modal-body');
+    
+    if (success) {
+        header.className = 'modal-header bg-success text-white';
+        title.innerHTML = `<i class="fas fa-check-circle me-2"></i>Pago ${type} Exitoso`;
+        
+        if (type === 'SINPE') {
+            body.innerHTML = `
+                <div class="text-center mb-4">
+                    <i class="fas fa-mobile-alt fa-4x text-success mb-3"></i>
+                    <h4>¡Pago SINPE Completado!</h4>
+                </div>
+                <table class="table table-sm">
+                    <tr><td><strong>ID de Transacción:</strong></td><td>${result.transaction_id}</td></tr>
+                    <tr><td><strong>Código de Confirmación:</strong></td><td><code>${result.confirmation_code}</code></td></tr>
+                    <tr><td><strong>Monto:</strong></td><td>${formatCurrency(result.amount, 'CRC')}</td></tr>
+                    <tr><td><strong>Teléfono Destino:</strong></td><td>${result.recipient_phone}</td></tr>
+                    <tr><td><strong>Estado:</strong></td><td><span class="badge bg-success">${result.status}</span></td></tr>
+                    <tr><td><strong>Fecha:</strong></td><td>${formatDate(result.processed_at)}</td></tr>
+                </table>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    El beneficiario ha recibido una notificación en su teléfono móvil.
+                </div>
+            `;
+        } else if (type === 'SWIFT') {
+            body.innerHTML = `
+                <div class="text-center mb-4">
+                    <i class="fas fa-globe fa-4x text-primary mb-3"></i>
+                    <h4>¡Transferencia SWIFT Iniciada!</h4>
+                </div>
+                <table class="table table-sm">
+                    <tr><td><strong>ID de Transacción:</strong></td><td>${result.transaction_id}</td></tr>
+                    <tr><td><strong>Referencia MT103:</strong></td><td><code>${result.mt103_reference}</code></td></tr>
+                    <tr><td><strong>Número de Seguimiento:</strong></td><td><code>${result.tracking_number}</code></td></tr>
+                    <tr><td><strong>Monto:</strong></td><td>${formatCurrency(result.amount, 'USD')}</td></tr>
+                    <tr><td><strong>Banco Destino:</strong></td><td>${result.recipient_bank}</td></tr>
+                    <tr><td><strong>Estado:</strong></td><td><span class="badge bg-warning">${result.status}</span></td></tr>
+                    <tr><td><strong>Fecha:</strong></td><td>${formatDate(result.processed_at)}</td></tr>
+                </table>
+                <div class="alert alert-warning">
+                    <i class="fas fa-clock me-1"></i>
+                    La transferencia será procesada en 1-3 días hábiles. Use el número de seguimiento para verificar el estado.
+                </div>
+            `;
+        }
+    } else {
+        header.className = 'modal-header bg-danger text-white';
+        title.innerHTML = `<i class="fas fa-times-circle me-2"></i>Error en Pago ${type}`;
+        body.innerHTML = `
+            <div class="text-center mb-4">
+                <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                <h4>Error procesando el pago</h4>
+                <p class="text-muted">${result.message || 'Error desconocido'}</p>
+            </div>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Por favor verifique los datos e intente nuevamente. Si el problema persiste, contacte soporte técnico.
+            </div>
+        `;
+    }
+    
+    const paymentModal = new bootstrap.Modal(modal);
+    paymentModal.show();
+    
+    // Update stats
+    updatePaymentStats();
+}
+
+function loadRecentPayments() {
+    // Mock recent payments data
+    const mockPayments = [
+        {
+            id: 1,
+            type: 'SINPE',
+            amount: 50000,
+            currency: 'CRC',
+            recipient: '87654321',
+            status: 'COMPLETED',
+            date: new Date().toISOString()
+        },
+        {
+            id: 2,
+            type: 'SWIFT',
+            amount: 1500,
+            currency: 'USD',
+            recipient: 'JP Morgan Chase',
+            status: 'PENDING',
+            date: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+            id: 3,
+            type: 'SINPE',
+            amount: 25000,
+            currency: 'CRC',
+            recipient: '88887777',
+            status: 'COMPLETED',
+            date: new Date(Date.now() - 7200000).toISOString()
+        }
+    ];
+    
+    const recentPaymentsDiv = document.getElementById('recent-payments');
+    recentPaymentsDiv.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Monto</th>
+                        <th>Destinatario</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${mockPayments.map(payment => `
+                        <tr>
+                            <td>
+                                <span class="badge bg-${payment.type === 'SINPE' ? 'success' : 'primary'}">
+                                    <i class="fas fa-${payment.type === 'SINPE' ? 'mobile-alt' : 'globe'} me-1"></i>
+                                    ${payment.type}
+                                </span>
+                            </td>
+                            <td><strong>${formatCurrency(payment.amount, payment.currency)}</strong></td>
+                            <td>${payment.recipient}</td>
+                            <td>
+                                <span class="badge bg-${payment.status === 'COMPLETED' ? 'success' : payment.status === 'PENDING' ? 'warning' : 'danger'}">
+                                    ${payment.status}
+                                </span>
+                            </td>
+                            <td>${formatDate(payment.date)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewPaymentDetails(${payment.id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="printPaymentReceipt(${payment.id})">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function updatePaymentStats() {
+    // Mock stats - in real implementation, these would come from API
+    document.getElementById('completed-payments').textContent = '156';
+    document.getElementById('pending-payments').textContent = '8';
+    document.getElementById('failed-payments').textContent = '2';
+}
+
+function viewPaymentDetails(paymentId) {
+    showToast(`Mostrando detalles del pago ${paymentId}`, 'info');
+    // In real implementation, this would fetch and show detailed payment information
+}
+
+function printPaymentReceipt(paymentId) {
+    showToast(`Imprimiendo comprobante del pago ${paymentId}`, 'info');
+    // In real implementation, this would generate and print a payment receipt
+}
+
+function printReceipt() {
+    if (lastPaymentResult) {
+        showToast('Generando comprobante de pago...', 'success');
+        // In real implementation, this would generate a printable receipt
+    } else {
+        showToast('No hay información de pago para imprimir', 'error');
+    }
+}
+
+function refreshPayments() {
+    loadPaymentsData();
+    loadRecentPayments();
+    updatePaymentStats();
+    showToast('Datos de pagos actualizados', 'success');
+}
+</script>
+{% endblock %}

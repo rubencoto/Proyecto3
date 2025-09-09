@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from database import get_db, create_tables, engine
@@ -28,11 +30,47 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Mount static files and templates
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
 # Create tables on startup
 @app.on_event("startup")
 async def startup_event():
     create_tables()
     logger.info("Banking MVP started successfully")
+
+
+# Web Interface Routes
+@app.get("/", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    """Main dashboard page"""
+    return templates.TemplateResponse("dashboard.html", {"request": request})
+
+@app.get("/customers-page", response_class=HTMLResponse)
+async def customers_page(request: Request):
+    """Customer management page"""
+    return templates.TemplateResponse("customers.html", {"request": request})
+
+@app.get("/accounts-page", response_class=HTMLResponse)
+async def accounts_page(request: Request):
+    """Account management page"""
+    return templates.TemplateResponse("accounts.html", {"request": request})
+
+@app.get("/transactions-page", response_class=HTMLResponse)
+async def transactions_page(request: Request):
+    """Transaction management page"""
+    return templates.TemplateResponse("transactions.html", {"request": request})
+
+@app.get("/reports-page", response_class=HTMLResponse)
+async def reports_page(request: Request):
+    """Reports page"""
+    return templates.TemplateResponse("reports.html", {"request": request})
+
+@app.get("/payments-page", response_class=HTMLResponse)
+async def payments_page(request: Request):
+    """Payments page"""
+    return templates.TemplateResponse("payments.html", {"request": request})
 
 
 # Health Check
@@ -68,6 +106,14 @@ async def create_customer(customer: CustomerCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@app.get("/customers", response_model=List[CustomerResponse])
+async def get_customers(db: Session = Depends(get_db)):
+    """Get all customers"""
+    from database import Customer
+    customers = db.query(Customer).all()
+    return customers
+
+
 # Account Endpoints
 @app.post("/accounts", response_model=AccountResponse)
 async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
@@ -81,6 +127,14 @@ async def create_account(account: AccountCreate, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Unexpected error creating account: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.get("/accounts", response_model=List[AccountResponse])
+async def get_accounts(db: Session = Depends(get_db)):
+    """Get all accounts"""
+    from database import Account
+    accounts = db.query(Account).all()
+    return accounts
 
 
 @app.get("/accounts/{account_id}/balance", response_model=BalanceResponse)

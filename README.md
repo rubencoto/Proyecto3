@@ -1,173 +1,266 @@
-# Banking MVP
+# ?? Banking MVP - Sistema Bancario Completo con Interfaz Web
 
-A complete banking MVP built with FastAPI, SQLAlchemy, and MySQL with SSL support.
+Un sistema bancario completo desarrollado con **FastAPI**, **SQLAlchemy**, **MySQL** y una **interfaz web moderna** construida con **HTML5**, **CSS3**, **JavaScript** y **Bootstrap 5**.
 
-## Features
+## ? **NUEVA CARACTERÍSTICA: INTERFAZ WEB COMPLETA**
 
-### Core Banking
-- **Customer Management (KYC)**: Create customers with sanction list validation
-- **Account Management**: Multi-currency accounts (CRC/USD) with status management
-- **Transaction Processing**: Deposits, withdrawals, and internal transfers with dual-entry accounting
-- **Balance Inquiry**: Real-time balance and statement generation
-- **Daily Limits**: Configurable daily transaction limits with alerts
-- **Complaints**: Ticket system with SLA tracking
+### ?? **Dashboard Web Interactivo**
+- **Dashboard Principal** con estadísticas en tiempo real
+- **Gestión de Clientes** con formularios interactivos
+- **Administración de Cuentas** con visualización de balances
+- **Procesamiento de Transacciones** en tiempo real
+- **Sistema de Pagos Externos** (SINPE/SWIFT)
+- **Reportería Avanzada** con gráficos y exportación
+- **Verificación AML/ROS** automatizada
+- **Calculadora de Intereses** integrada
 
-### External Payments (Stubs)
-- **SINPE**: Mock Costa Rican instant payment system
-- **SWIFT**: Mock international wire transfer with MT103 references
+### ?? **Características de la Interfaz**
+- ? **Diseño Responsivo** - Compatible con móviles y desktop
+- ? **Interfaz Moderna** - Bootstrap 5.3 + Font Awesome 6.4
+- ? **Gráficos Interactivos** - Chart.js para visualización de datos
+- ? **Validación en Tiempo Real** - Formularios con validación instantánea
+- ? **Notificaciones Toast** - Feedback inmediato al usuario
+- ? **Navegación Intuitiva** - Menú de navegación claro y consistente
+- ? **Estados en Tiempo Real** - Actualización automática de datos
+- ? **Exportación de Datos** - CSV y JSON para reportes
 
-### Compliance & Risk
-- **AML/ROS**: Anti-money laundering detection for transactions ? ?10,000,000
-- **Interest Calculation**: Tax withholding calculation for interest earnings
-- **Regulatory Reporting**: SUGEF/IFRS style reports (JSON/CSV export)
+## ?? **Inicio Rápido con Interfaz Web**
 
-### Digital Channels
-- **MFA**: Multi-factor authentication simulation
-- **Health Monitoring**: System health checks
-
-### Reports
-- **Trial Balance**: Account summaries by currency (JSON/CSV export)
-- **Account Statements**: Transaction history with pagination
-
-## Tech Stack
-
-- **FastAPI**: Modern, fast web framework
-- **SQLAlchemy**: ORM with MySQL support
-- **PyMySQL**: MySQL connector with SSL support
-- **Alembic**: Database migrations
-- **Pydantic**: Data validation
-- **Pytest**: Testing framework
-- **Loguru**: Advanced logging
-- **Python-dotenv**: Environment management
-
-## Installation
-
-1. **Install Dependencies**:
+### 1. **Instalación**
 ```bash
+# Clonar el repositorio
+git clone https://github.com/rubencoto/Proyecto3.git
+cd Proyecto3
+
+# Instalar dependencias
 pip install -r requirements.txt
 ```
 
-2. **Configure Environment**:
-Create a `.env` file with your database configuration:
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=banking_user
-DB_PASS=banking_password
-DB_NAME=banking_mvp
-```
-
-3. **Setup Database**:
-Ensure MySQL is running with SSL enabled and create the database:
+### 2. **Configuración de Base de Datos**
 ```sql
+-- En MySQL
 CREATE DATABASE banking_mvp;
 CREATE USER 'banking_user'@'%' IDENTIFIED BY 'banking_password';
 GRANT ALL PRIVILEGES ON banking_mvp.* TO 'banking_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-## Running the Application
-
-**Development Server**:
+### 3. **Lanzar la Aplicación Web**
 ```bash
+# Opción 1: Launcher web completo
+python web_launcher.py
+
+# Opción 2: Directamente
 python main.py
+
+# Opción 3: Con uvicorn
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-**Production (with Uvicorn)**:
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+### 4. **Acceder a la Interfaz Web**
+```
+?? Dashboard Principal: http://localhost:8000/
+?? API Documentation: http://localhost:8000/docs
+?? API Redoc: http://localhost:8000/redoc
 ```
 
-The API will be available at `http://localhost:8000`
-Interactive documentation at `http://localhost:8000/docs`
+## ?? **Páginas Web Disponibles**
 
-## API Endpoints
+| Página | URL | Descripción |
+|--------|-----|-------------|
+| **Dashboard** | `/` | Panel principal con estadísticas y acciones rápidas |
+| **Clientes** | `/customers-page` | Gestión completa de clientes con KYC |
+| **Cuentas** | `/accounts-page` | Administración de cuentas bancarias |
+| **Transacciones** | `/transactions-page` | Procesamiento de depósitos, retiros y transferencias |
+| **Pagos** | `/payments-page` | Sistema de pagos externos (SINPE/SWIFT) |
+| **Reportes** | `/reports-page` | Reportería financiera y regulatoria |
 
-### Core Banking
-- `POST /customers` - Create customer (rejects if sanctioned)
-- `POST /accounts` - Create account
-- `POST /transactions/deposit` - Process deposit
-- `POST /transactions/withdraw` - Process withdrawal  
-- `POST /transactions/transfer` - Internal transfer (atomic)
-- `GET /accounts/{id}/balance` - Get account balance
-- `GET /accounts/{id}/statement` - Get account statement
-- `POST /limits/check` - Check daily limits
-- `POST /complaints` - Create complaint ticket
+## ??? **Stack Tecnológico**
 
-### Reports
-- `GET /reports/trial-balance` - Generate trial balance (JSON/CSV)
-- `GET /reports/regulatory` - Regulatory reports (SUGEF/IFRS)
+### **Frontend**
+- **HTML5** - Estructura semántica moderna
+- **CSS3** - Estilos avanzados con variables CSS
+- **JavaScript ES6+** - Lógica interactiva y asíncrona
+- **Bootstrap 5.3** - Framework CSS responsivo
+- **Font Awesome 6.4** - Iconografía profesional
+- **Chart.js** - Gráficos interactivos
 
-### External Payments (Stubs)
-- `POST /payments/sinpe` - SINPE payment simulation
-- `POST /payments/swift` - SWIFT payment simulation
+### **Backend**
+- **FastAPI** - Framework web moderno y rápido
+- **SQLAlchemy 2.0** - ORM avanzado
+- **Alembic** - Migraciones de base de datos
+- **Pydantic** - Validación de datos
+- **Jinja2** - Motor de templates
+- **PyMySQL** - Conector MySQL con SSL
 
-### Compliance (Stubs)
-- `POST /aml/check` - AML risk assessment
-- `POST /interests/calc` - Interest and tax calculation
-- `POST /auth/mfa` - Multi-factor authentication
+### **Base de Datos**
+- **MySQL 8.0+** - Base de datos relacional
+- **SSL/TLS** - Conexiones seguras
+- **Transacciones ACID** - Integridad de datos
 
-### Not Implemented (Stubs)
-- `POST /cards` - Card management
-- `POST /loans` - Loan management
+## ?? **Funcionalidades Principales**
 
-### System
-- `GET /health` - System health check
+### ?? **Dashboard Interactivo**
+- Resumen de clientes, cuentas y balances
+- Gráficos de distribución por moneda
+- Acciones rápidas y atajos
+- Monitoreo de estado del sistema
+- Actividad reciente en tiempo real
 
-## Testing
+### ?? **Gestión de Clientes**
+- **Registro KYC** con validación de listas de sanciones
+- **Búsqueda y filtros** avanzados
+- **Vista detallada** con cuentas asociadas
+- **Estados de clientes** (activo/sancionado)
+- **Auditoría completa** de cambios
 
-Run the complete test suite:
+### ?? **Administración de Cuentas**
+- **Creación de cuentas** multi-moneda (CRC/USD)
+- **Consulta de balances** en tiempo real
+- **Límites diarios** configurables
+- **Estados de cuenta** detallados
+- **Trial Balance** automático
+
+### ?? **Sistema de Transacciones**
+- **Depósitos, Retiros y Transferencias**
+- **Formularios rápidos** para operaciones frecuentes
+- **Validación AML/ROS** automática
+- **Límites diarios** con alertas
+- **Contabilidad de doble entrada**
+
+### ?? **Pagos Externos**
+- **SINPE** - Pagos instantáneos con número de teléfono
+- **SWIFT** - Transferencias internacionales
+- **Validación en tiempo real** de datos
+- **Comprobantes digitales**
+- **Seguimiento de estados**
+
+### ?? **Reportería Avanzada**
+- **Trial Balance** con exportación CSV/JSON
+- **Reportes SUGEF e IFRS** regulatorios
+- **Gráficos interactivos** de balances y cuentas
+- **Calculadora de intereses** con retención fiscal
+- **Alertas AML** con seguimiento
+
+## ?? **Seguridad y Compliance**
+
+### **AML/ROS (Anti-Money Laundering)**
+- ? Detección automática de transacciones ? ?10,000,000
+- ? Verificación contra listas de sanciones
+- ? Alertas en tiempo real
+- ? Reportería de actividades sospechosas
+
+### **Controles Bancarios**
+- ? Límites diarios por cuenta
+- ? Estados de cuenta (activa/bloqueada/cerrada)
+- ? Validación de fondos suficientes
+- ? Atomicidad en transferencias
+
+### **Seguridad Técnica**
+- ? Conexiones SSL/TLS obligatorias
+- ? Validación de datos con Pydantic
+- ? Transacciones ACID en base de datos
+- ? Logging completo de operaciones
+
+## ?? **Testing y Calidad**
+
+### **Suite de Pruebas**
 ```bash
+# Ejecutar todas las pruebas
 pytest test_main.py -v
+
+# Pruebas específicas
+pytest test_main.py::test_customer_creation -v
+pytest test_main.py::test_transaction_processing -v
+pytest test_main.py::test_aml_detection -v
 ```
 
-### Test Coverage
-- ? Sanctioned customer rejection (409)
-- ? Insufficient funds validation (400)
-- ? Atomic transfers with dual accounting entries
-- ? AML alerts for large transactions (? ?10,000,000)
-- ? Interest calculation with tax withholding
-- ? System health monitoring
+### **Demostración del Sistema**
+```bash
+# Script de demostración completa
+python demo.py
 
-## Database Schema
+# Verificación de conexión DB
+python simple_check.py
+```
 
-The application automatically creates the following tables:
-- `customers` - Customer information and KYC data
-- `accounts` - Account details with balances and limits
-- `transactions` - All transaction records
-- `accounting_entries` - Dual-entry bookkeeping records
-- `daily_limits` - Daily transaction limit tracking
-- `alerts` - System alerts and notifications
-- `complaints` - Customer complaint tickets
+## ?? **API REST Completa**
 
-## Security Features
+La aplicación mantiene compatibilidad total con la API REST:
 
-- **SSL Required**: All database connections use SSL
-- **Sanction List**: Automatic validation against sanction lists
-- **Daily Limits**: Configurable transaction limits
-- **AML Monitoring**: Large transaction detection
-- **Audit Trail**: Complete transaction logging
+### **Endpoints Principales**
+```
+POST /customers          # Crear cliente
+GET  /customers          # Listar clientes
+POST /accounts           # Crear cuenta
+GET  /accounts           # Listar cuentas
+GET  /accounts/{id}/balance    # Consultar balance
+POST /transactions/deposit     # Depósito
+POST /transactions/withdraw    # Retiro  
+POST /transactions/transfer    # Transferencia
+POST /payments/sinpe     # Pago SINPE
+POST /payments/swift     # Transferencia SWIFT
+GET  /reports/trial-balance    # Trial Balance
+POST /aml/check          # Verificación AML
+```
 
-## Business Rules
+## ??? **Configuración**
 
-1. **Customer Creation**: Rejected if `is_sanction_listed=True`
-2. **Transfers**: Must have sufficient balance, updates both accounts atomically
-3. **Daily Limits**: Configurable per account, generates alerts when exceeded
-4. **AML**: Flags transactions ? ?10,000,000 for review
-5. **Complaints**: Automatic SLA calculation with due dates
-6. **Accounting**: Every transaction creates proper debit/credit entries
+### **Variables de Entorno (.env)**
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=banking_user
+DB_PASS=banking_password
+DB_NAME=banking_mvp
 
-## Production Considerations
+# Application Configuration
+APP_HOST=0.0.0.0
+APP_PORT=8000
+DEBUG=True
 
-- Configure proper SSL certificates for MySQL
-- Set up database connection pooling
-- Implement proper authentication/authorization
-- Add rate limiting and API security
-- Configure production logging
-- Set up monitoring and alerting
-- Implement database backups
-- Add data encryption for sensitive fields
+# Logging
+LOG_LEVEL=INFO
+```
 
-## License
+### **Personalización**
+- **Temas CSS** - Variables CSS fácilmente modificables
+- **Límites de transacción** - Configurables por tipo de cuenta
+- **Tasas de interés** - Parametrizables en la calculadora
+- **Reportes** - Templates personalizables
 
-This is an educational MVP for banking system development.
+## ?? **Despliegue**
+
+### **Desarrollo**
+```bash
+python web_launcher.py
+```
+
+### **Producción**
+```bash
+# Con Gunicorn
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+
+# Con Docker (ejemplo)
+docker build -t banking-mvp .
+docker run -p 8000:8000 banking-mvp
+```
+
+## ?? **Soporte y Contacto**
+
+- **Repositorio**: https://github.com/rubencoto/Proyecto3
+- **Issues**: Reportar bugs y solicitudes de features
+- **Documentación**: Disponible en `/docs` cuando la app esté ejecutándose
+
+## ?? **Licencia**
+
+Proyecto educativo desarrollado para demostrar capacidades de desarrollo full-stack con Python, FastAPI y tecnologías web modernas.
+
+---
+
+## ?? **¡Disfruta del Sistema Bancario Completo!**
+
+La combinación de una **API REST robusta** con una **interfaz web moderna** proporciona una experiencia completa tanto para desarrolladores como para usuarios finales. El sistema está diseñado para ser escalable, seguro y fácil de mantener.
+
+**¡Explora todas las funcionalidades en http://localhost:8000/ después de iniciar la aplicación!**

@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Clientes - Banking MVP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-users me-2"></i>Gestión de Clientes</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerModal">
+                <i class="fas fa-user-plus me-1"></i>Nuevo Cliente
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" class="form-control" id="search-customers" placeholder="Buscar clientes...">
+        </div>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="active">Activos</option>
+            <option value="sanctioned">Sancionados</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-outline-secondary w-100" onclick="refreshCustomers()">
+            <i class="fas fa-sync-alt me-1"></i>Actualizar
+        </button>
+    </div>
+</div>
+
+<!-- Customers Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>Lista de Clientes</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre Completo</th>
+                        <th>Documento</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="customers-table-body">
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Nuevo Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="customer-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first-name" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="first-name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last-name" class="form-label">Apellidos *</label>
+                                <input type="text" class="form-control" id="last-name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="document-id" class="form-label">Documento de Identidad *</label>
+                                <input type="text" class="form-control" id="document-id" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="is-sanction-listed">
+                                    <label class="form-check-label text-danger" for="is-sanction-listed">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Cliente en lista de sanciones
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <strong>Nota:</strong> Los clientes marcados como sancionados no podrán ser registrados.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="createCustomer()">
+                    <i class="fas fa-save me-1"></i>Registrar Cliente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Details Modal -->
+<div class="modal fade" id="customerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user me-2"></i>Detalles del Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customer-details-body">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="createAccountForCustomer()">
+                    <i class="fas fa-plus me-1"></i>Crear Cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentCustomers = [];
+let selectedCustomerId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadCustomers();
+    
+    // Setup search functionality
+    document.getElementById('search-customers').addEventListener('input', filterCustomers);
+    document.getElementById('filter-status').addEventListener('change', filterCustomers);
+});
+
+async function loadCustomers() {
+    try {
+        const response = await fetch('/customers');
+        if (!response.ok) {
+            throw new Error('Error loading customers');
+        }
+        
+        currentCustomers = await response.json();
+        displayCustomers(currentCustomers);
+    } catch (error) {
+        console.error('Error loading customers:', error);
+        showToast('Error cargando clientes', 'error');
+        document.getElementById('customers-table-body').innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Error cargando datos de clientes
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function displayCustomers(customers) {
+    const tbody = document.getElementById('customers-table-body');
+    
+    if (customers.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <i class="fas fa-info-circle text-muted me-1"></i>
+                    No hay clientes registrados
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = customers.map(customer => `
+        <tr>
+            <td>${customer.id}</td>
+            <td>${customer.first_name} ${customer.last_name}</td>
+            <td>${customer.document_id}</td>
+            <td>${customer.email}</td>
+            <td>${customer.phone || 'N/A'}</td>
+            <td>
+                ${customer.is_sanction_listed 
+                    ? '<span class="badge bg-danger"><i class="fas fa-ban me-1"></i>Sancionado</span>'
+                    : '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Activo</span>'
+                }
+            </td>
+            <td>${new Date(customer.created_at).toLocaleDateString()}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewCustomerDetails(${customer.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="createAccountForCustomer(${customer.id})">
+                    <i class="fas fa-credit-card"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function filterCustomers() {
+    const searchTerm = document.getElementById('search-customers').value.toLowerCase();
+    const statusFilter = document.getElementById('filter-status').value;
+    
+    let filteredCustomers = currentCustomers.filter(customer => {
+        const matchesSearch = 
+            customer.first_name.toLowerCase().includes(searchTerm) ||
+            customer.last_name.toLowerCase().includes(searchTerm) ||
+            customer.document_id.toLowerCase().includes(searchTerm) ||
+            customer.email.toLowerCase().includes(searchTerm);
+        
+        const matchesStatus = 
+            statusFilter === '' ||
+            (statusFilter === 'active' && !customer.is_sanction_listed) ||
+            (statusFilter === 'sanctioned' && customer.is_sanction_listed);
+        
+        return matchesSearch && matchesStatus;
+    });
+    
+    displayCustomers(filteredCustomers);
+}
+
+async function createCustomer() {
+    const formData = {
+        first_name: document.getElementById('first-name').value,
+        last_name: document.getElementById('last-name').value,
+        document_id: document.getElementById('document-id').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value || null,
+        is_sanction_listed: document.getElementById('is-sanction-listed').checked
+    };
+    
+    // Validation
+    if (!formData.first_name || !formData.last_name || !formData.document_id || !formData.email) {
+        showToast('Por favor complete todos los campos requeridos', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/customers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('customerModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('customer-form').reset();
+            
+            showToast('Cliente registrado exitosamente', 'success');
+            loadCustomers(); // Reload the table
+        } else {
+            if (response.status === 409) {
+                showToast('Cliente en lista de sanciones - Registro denegado', 'error');
+            } else {
+                showToast(result.detail || 'Error registrando cliente', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error creating customer:', error);
+        showToast('Error conectando con el servidor', 'error');
+    }
+}
+
+async function viewCustomerDetails(customerId) {
+    selectedCustomerId = customerId;
+    const customer = currentCustomers.find(c => c.id === customerId);
+    
+    if (!customer) {
+        showToast('Cliente no encontrado', 'error');
+        return;
+    }
+    
+    // Load customer accounts
+    try {
+        const accountsResponse = await fetch('/accounts');
+        const allAccounts = await accountsResponse.json();
+        const customerAccounts = allAccounts.filter(acc => acc.customer_id === customerId);
+        
+        const detailsBody = document.getElementById('customer-details-body');
+        detailsBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Información Personal</h6>
+                    <table class="table table-sm">
+                        <tr><td><strong>Nombre:</strong></td><td>${customer.first_name} ${customer.last_name}</td></tr>
+                        <tr><td><strong>Documento:</strong></td><td>${customer.document_id}</td></tr>
+                        <tr><td><strong>Email:</strong></td><td>${customer.email}</td></tr>
+                        <tr><td><strong>Teléfono:</strong></td><td>${customer.phone || 'N/A'}</td></tr>
+                        <tr><td><strong>Estado:</strong></td><td>
+                            ${customer.is_sanction_listed 
+                                ? '<span class="badge bg-danger">Sancionado</span>'
+                                : '<span class="badge bg-success">Activo</span>'
+                            }
+                        </td></tr>
+                        <tr><td><strong>Registro:</strong></td><td>${new Date(customer.created_at).toLocaleString()}</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Cuentas Asociadas (${customerAccounts.length})</h6>
+                    ${customerAccounts.length > 0 ? `
+                        <div class="list-group">
+                            ${customerAccounts.map(account => `
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>${account.account_number}</strong>
+                                            <br>
+                                            <small class="text-muted">${account.currency} - ${account.status}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <strong>${account.currency === 'CRC' ? '?' : '$'} ${parseFloat(account.balance).toLocaleString()}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p class="text-muted">No tiene cuentas asociadas</p>'}
+                </div>
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('customerDetailsModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error loading customer details:', error);
+        showToast('Error cargando detalles del cliente', 'error');
+    }
+}
+
+function createAccountForCustomer(customerId = null) {
+    const targetCustomerId = customerId || selectedCustomerId;
+    if (!targetCustomerId) {
+        showToast('Seleccione un cliente', 'error');
+        return;
+    }
+    
+    // Close current modal if open
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('customerDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    // Redirect to accounts page with customer pre-selected
+    window.location.href = `/accounts-page?customer_id=${targetCustomerId}`;
+}
+
+function refreshCustomers() {
+    loadCustomers();
+    showToast('Lista de clientes actualizada', 'success');
+}
+</script>
+{% endblock %}
