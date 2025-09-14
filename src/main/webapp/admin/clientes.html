@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - BancoSeguro Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b7791f;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-info {
+            background: #3182ce;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2c5282;
+        }
+
+        .clients-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-suspended {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fef5e7;
+            color: #744210;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .kyc-complete {
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .kyc-pending {
+            color: #d69e2e;
+            font-weight: bold;
+        }
+
+        .kyc-incomplete {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="adminDashboard.html">Dashboard</a>
+            <a href="clientes.html" class="active">Clientes</a>
+            <a href="cuentas.html">Cuentas</a>
+            <a href="gestionKyc.html">KYC</a>
+            <a href="../login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h2>Gestión de Clientes</h2>
+                <p>Administre la información y estado de todos los clientes del banco</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddClientModal()">
+                ➕ Nuevo Cliente
+            </button>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-number">15,847</div>
+                <div class="stat-text">Total Clientes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">15,203</div>
+                <div class="stat-text">Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">127</div>
+                <div class="stat-text">Nuevos (Mes)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">517</div>
+                <div class="stat-text">Suspendidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">284</div>
+                <div class="stat-text">KYC Pendiente</div>
+            </div>
+        </div>
+
+        <!-- Filtros y búsqueda -->
+        <div class="search-section">
+            <h3 style="margin-bottom: 1rem;">Filtros de Búsqueda</h3>
+            <div class="search-grid">
+                <div class="form-group">
+                    <label for="searchName">Nombre/Identificación:</label>
+                    <input type="text" id="searchName" placeholder="Buscar cliente...">
+                </div>
+                <div class="form-group">
+                    <label for="statusFilter">Estado:</label>
+                    <select id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="active">Activo</option>
+                        <option value="suspended">Suspendido</option>
+                        <option value="pending">Pendiente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="kycFilter">Estado KYC:</label>
+                    <select id="kycFilter">
+                        <option value="">Todos</option>
+                        <option value="complete">Completo</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="incomplete">Incompleto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dateFilter">Fecha registro:</label>
+                    <select id="dateFilter">
+                        <option value="">Todas las fechas</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                        <option value="year">Este año</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="searchClients()">🔍 Buscar</button>
+                        <button class="btn btn-warning" onclick="clearFilters()">🔄 Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de clientes -->
+        <div class="clients-table">
+            <div class="table-header">
+                <h3>Lista de Clientes</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-info" onclick="exportClients()">📊 Exportar</button>
+                    <button class="btn btn-warning" onclick="bulkActions()">⚡ Acciones Masivas</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" onchange="selectAll(this)"></th>
+                        <th>ID Cliente</th>
+                        <th>Nombre Completo</th>
+                        <th>Identificación</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>KYC</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    <tr>
+                        <td><input type="checkbox" class="client-check" value="1001"></td>
+                        <td><strong>CLI-1001</strong></td>
+                        <td>María Rodríguez Jiménez</td>
+                        <td>1-1234-5678</td>
+                        <td>maria.rodriguez@email.com</td>
+                        <td>+506 8888-1234</td>
+                        <td><span class="status-active">Activo</span></td>
+                        <td><span class="kyc-complete">✓ Completo</span></td>
+                        <td>15/03/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewClient('CLI-1001')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editClient('CLI-1001')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="suspendClient('CLI-1001')">⏸️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="client-check" value="1002"></td>
+                        <td><strong>CLI-1002</strong></td>
+                        <td>Juan Carlos Pérez Soto</td>
+                        <td>2-2345-6789</td>
+                        <td>juan.perez@email.com</td>
+                        <td>+506 7777-5678</td>
+                        <td><span class="status-active">Activo</span></td>
+                        <td><span class="kyc-pending">⏳ Pendiente</span></td>
+                        <td>22/03/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewClient('CLI-1002')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editClient('CLI-1002')">✏️</button>
+                            <button class="action-btn btn-danger" onclick="processKyc('CLI-1002')">🔍</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="client-check" value="1003"></td>
+                        <td><strong>CLI-1003</strong></td>
+                        <td>Ana Patricia Morales Vega</td>
+                        <td>1-3456-7890</td>
+                        <td>ana.morales@email.com</td>
+                        <td>+506 6666-9012</td>
+                        <td><span class="status-suspended">Suspendido</span></td>
+                        <td><span class="kyc-incomplete">❌ Incompleto</span></td>
+                        <td>08/04/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewClient('CLI-1003')">👁️</button>
+                            <button class="action-btn btn-success" onclick="activateClient('CLI-1003')">▶️</button>
+                            <button class="action-btn btn-danger" onclick="processKyc('CLI-1003')">🔍</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="client-check" value="1004"></td>
+                        <td><strong>CLI-1004</strong></td>
+                        <td>Roberto Antonio Vargas López</td>
+                        <td>1-4567-8901</td>
+                        <td>roberto.vargas@email.com</td>
+                        <td>+506 8888-3456</td>
+                        <td><span class="status-active">Activo</span></td>
+                        <td><span class="kyc-complete">✓ Completo</span></td>
+                        <td>12/04/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewClient('CLI-1004')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editClient('CLI-1004')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="suspendClient('CLI-1004')">⏸️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="client-check" value="1005"></td>
+                        <td><strong>CLI-1005</strong></td>
+                        <td>Carmen Elena Solís Hernández</td>
+                        <td>2-5678-9012</td>
+                        <td>carmen.solis@email.com</td>
+                        <td>+506 7777-7890</td>
+                        <td><span class="status-pending">Pendiente</span></td>
+                        <td><span class="kyc-pending">⏳ Pendiente</span></td>
+                        <td>14/09/2025</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewClient('CLI-1005')">👁️</button>
+                            <button class="action-btn btn-success" onclick="approveClient('CLI-1005')">✅</button>
+                            <button class="action-btn btn-danger" onclick="rejectClient('CLI-1005')">❌</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination">
+            <button onclick="changePage(1)">← Anterior</button>
+            <button onclick="changePage(1)" class="active">1</button>
+            <button onclick="changePage(2)">2</button>
+            <button onclick="changePage(3)">3</button>
+            <button onclick="changePage(4)">4</button>
+            <button onclick="changePage(5)">5</button>
+            <button onclick="changePage(2)">Siguiente →</button>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles del cliente -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeClientModal()">&times;</span>
+            <h3>Detalles del Cliente</h3>
+
+            <div class="modal-section">
+                <h4>Información Personal</h4>
+                <div class="info-grid" id="personalInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>Información de Contacto</h4>
+                <div class="info-grid" id="contactInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>Cuentas Asociadas</h4>
+                <div id="accountsInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>Historial de Actividades</h4>
+                <div id="activityLog">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos simulados de clientes
+        const clientsData = {
+            'CLI-1001': {
+                name: 'María Rodríguez Jiménez',
+                id: '1-1234-5678',
+                email: 'maria.rodriguez@email.com',
+                phone: '+506 8888-1234',
+                birthDate: '15/08/1985',
+                address: 'San José, Escazú, Del Mall 200m norte',
+                occupation: 'Ingeniera de Software',
+                income: '₡1,500,000',
+                accounts: ['CR05015108410026012345 - Corriente', 'CR05015108410026067890 - Ahorros'],
+                activities: [
+                    { date: '14/09/2025', action: 'Transferencia SINPE', amount: '₡50,000' },
+                    { date: '12/09/2025', action: 'Depósito', amount: '₡200,000' }
+                ]
+            }
+        };
+
+        function searchClients() {
+            const searchName = document.getElementById('searchName').value;
+            alert(`Buscando clientes con: "${searchName}"`);
+            // Aquí se implementaría la búsqueda real
+        }
+
+        function clearFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('kycFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            alert('Filtros limpiados');
+        }
+
+        function viewClient(clientId) {
+            const data = clientsData[clientId] || {
+                name: 'Cliente de Ejemplo',
+                id: '1-0000-0000',
+                email: 'cliente@ejemplo.com',
+                phone: '+506 0000-0000',
+                birthDate: '01/01/1990',
+                address: 'Dirección no disponible',
+                occupation: 'No especificado',
+                income: 'No especificado',
+                accounts: ['Sin cuentas registradas'],
+                activities: [{ date: 'N/A', action: 'Sin actividades', amount: '-' }]
+            };
+
+            // Llenar información personal
+            document.getElementById('personalInfo').innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Nombre Completo</div>
+                    <div class="info-value">${data.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Identificación</div>
+                    <div class="info-value">${data.id}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Fecha de Nacimiento</div>
+                    <div class="info-value">${data.birthDate}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ocupación</div>
+                    <div class="info-value">${data.occupation}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ingresos</div>
+                    <div class="info-value">${data.income}</div>
+                </div>
+            `;
+
+            // Llenar información de contacto
+            document.getElementById('contactInfo').innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">${data.email}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Teléfono</div>
+                    <div class="info-value">${data.phone}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Dirección</div>
+                    <div class="info-value">${data.address}</div>
+                </div>
+            `;
+
+            // Llenar cuentas
+            document.getElementById('accountsInfo').innerHTML = data.accounts.map(account =>
+                `<div style="padding: 0.5rem; background: #f8f9fa; margin: 0.5rem 0; border-radius: 5px;">${account}</div>`
+            ).join('');
+
+            // Llenar actividades
+            document.getElementById('activityLog').innerHTML = data.activities.map(activity =>
+                `<div style="padding: 0.5rem; background: #f8f9fa; margin: 0.5rem 0; border-radius: 5px;">
+                    <strong>${activity.date}:</strong> ${activity.action} - ${activity.amount}
+                </div>`
+            ).join('');
+
+            document.getElementById('clientModal').style.display = 'block';
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').style.display = 'none';
+        }
+
+        function editClient(clientId) {
+            alert(`Editando cliente: ${clientId}`);
+        }
+
+        function suspendClient(clientId) {
+            if (confirm(`¿Está seguro que desea suspender el cliente ${clientId}?`)) {
+                alert(`Cliente ${clientId} suspendido exitosamente`);
+            }
+        }
+
+        function activateClient(clientId) {
+            if (confirm(`¿Desea activar el cliente ${clientId}?`)) {
+                alert(`Cliente ${clientId} activado exitosamente`);
+            }
+        }
+
+        function processKyc(clientId) {
+            alert(`Redirigiendo a proceso KYC para cliente: ${clientId}`);
+        }
+
+        function approveClient(clientId) {
+            if (confirm(`¿Aprobar la solicitud del cliente ${clientId}?`)) {
+                alert(`Cliente ${clientId} aprobado exitosamente`);
+            }
+        }
+
+        function rejectClient(clientId) {
+            if (confirm(`¿Rechazar la solicitud del cliente ${clientId}?`)) {
+                const reason = prompt('Motivo del rechazo:');
+                if (reason) {
+                    alert(`Cliente ${clientId} rechazado. Motivo: ${reason}`);
+                }
+            }
+        }
+
+        function selectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.client-check');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function showAddClientModal() {
+            alert('Abriendo formulario para nuevo cliente...');
+        }
+
+        function exportClients() {
+            alert('Exportando lista de clientes...');
+        }
+
+        function bulkActions() {
+            const selected = document.querySelectorAll('.client-check:checked');
+            if (selected.length === 0) {
+                alert('Seleccione al menos un cliente');
+                return;
+            }
+            alert(`Ejecutar acción masiva en ${selected.length} clientes seleccionados`);
+        }
+
+        function changePage(page) {
+            document.querySelectorAll('.pagination button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            alert(`Cargando página ${page}...`);
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('clientModal');
+            if (event.target === modal) {
+                closeClientModal();
+            }
+        }
+    </script>
+</body>
+</html>

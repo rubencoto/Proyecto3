@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.2">
+    <!-- Define Persistence Unit -->
+    <persistence-unit name="BancoPU" transaction-type="JTA">
+        <jta-data-source>java:/BancoDS</jta-data-source>
+
+        <!-- Entidades del sistema -->
+        <class>com.ulatina.data.Cliente</class>
+        <class>com.ulatina.data.Cuenta</class>
+        <class>com.ulatina.data.Usuario</class>
+        <class>com.ulatina.data.Movimiento</class>
+        <class>com.ulatina.data.Prestamo</class>
+        <class>com.ulatina.data.Cuota</class>
+        <class>com.ulatina.data.Tarjeta</class>
+        <class>com.ulatina.data.Transferencia</class>
+        <class>com.ulatina.data.TransferenciaSinpe</class>
+        <class>com.ulatina.data.TransferenciaSwift</class>
+
+        <!-- Entidades de seguridad y MFA -->
+        <class>com.ulatina.data.MfaToken</class>
+
+        <!-- Entidades del sistema de límites y alertas -->
+        <class>com.ulatina.data.LimiteTransaccion</class>
+        <class>com.ulatina.data.Alerta</class>
+        <class>com.ulatina.data.ConfiguracionNotificacion</class>
+        <class>com.ulatina.data.ListaRestrictiva</class>
+
+        <!-- Entidades contables -->
+        <class>com.ulatina.data.CuentaContable</class>
+        <class>com.ulatina.data.AsientoContable</class>
+        <class>com.ulatina.data.DetalleAsiento</class>
+
+        <properties>
+            <!-- Configuración de Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+
+            <!-- Pool de conexiones -->
+            <property name="hibernate.connection.CharSet" value="utf8"/>
+            <property name="hibernate.connection.characterEncoding" value="utf8"/>
+            <property name="hibernate.connection.useUnicode" value="true"/>
+
+            <!-- Cache de segundo nivel -->
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.jcache.JCacheRegionFactory"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .stat-increase {
+            color: #38a169;
+        }
+
+        .stat-decrease {
+            color: #e53e3e;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .activities-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .activity-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-list {
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #2d3748;
+        }
+
+        .activity-description {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-left: 1rem;
+        }
+
+        .alert-card {
+            background: linear-gradient(135deg, #feb2b2 0%, #fc8181 100%);
+            color: #742a2a;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .alert-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .quick-actions {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .status-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-online {
+            background: #38a169;
+        }
+
+        .status-warning {
+            background: #d69e2e;
+        }
+
+        .status-offline {
+            background: #e53e3e;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .activities-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="clientes.html">Clientes</a>
+            <a href="cuentas.html">Cuentas</a>
+            <a href="gestionKyc.html">KYC</a>
+            <a href="../login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h2>Panel de Administración</h2>
+            <p>Monitoreo y gestión del sistema bancario - <span id="currentDate"></span></p>
+        </div>
+
+        <!-- Alerta crítica -->
+        <div class="alert-card">
+            <div class="alert-title">🚨 Atención: Actividades Sospechosas Detectadas</div>
+            <div>Se han detectado 3 transacciones sospechosas en las últimas 24 horas. Requieren revisión inmediata.</div>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">15,847</div>
+                <div class="stat-label">Clientes Activos</div>
+                <div class="stat-change stat-increase">+2.5% este mes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💳</div>
+                <div class="stat-value">23,456</div>
+                <div class="stat-label">Cuentas Totales</div>
+                <div class="stat-change stat-increase">+1.8% este mes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">₡8.4B</div>
+                <div class="stat-label">Total Depósitos</div>
+                <div class="stat-change stat-increase">+5.2% este mes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-value">1,234</div>
+                <div class="stat-label">Transacciones Hoy</div>
+                <div class="stat-change stat-decrease">-8% vs ayer</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🏠</div>
+                <div class="stat-value">₡2.1B</div>
+                <div class="stat-label">Préstamos Activos</div>
+                <div class="stat-change stat-increase">+3.1% este mes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value">27</div>
+                <div class="stat-label">Alertas Pendientes</div>
+                <div class="stat-change stat-increase">+12 nuevas</div>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="quick-actions">
+            <h3>Acciones Rápidas</h3>
+            <div class="actions-grid">
+                <a href="clientes.html" class="action-btn">
+                    <span class="action-icon">👤</span>
+                    Gestionar Clientes
+                </a>
+                <a href="cuentas.html" class="action-btn">
+                    <span class="action-icon">🏦</span>
+                    Administrar Cuentas
+                </a>
+                <a href="gestionKyc.html" class="action-btn">
+                    <span class="action-icon">🔍</span>
+                    Procesos KYC
+                </a>
+                <a href="#" class="action-btn" onclick="generateReport()">
+                    <span class="action-icon">📊</span>
+                    Generar Reporte
+                </a>
+                <a href="#" class="action-btn" onclick="systemSettings()">
+                    <span class="action-icon">⚙️</span>
+                    Configuración
+                </a>
+                <a href="#" class="action-btn" onclick="viewAuditLog()">
+                    <span class="action-icon">📋</span>
+                    Log de Auditoría
+                </a>
+            </div>
+        </div>
+
+        <!-- Gráficos y análisis -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3>Transacciones por Día (Últimas 2 semanas)</h3>
+                <div class="chart-placeholder">
+                    📈 Gráfico de líneas - Volumen de transacciones diarias
+                    <br><small>Integración con Chart.js para gráficos interactivos</small>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>Distribución por Tipo de Cuenta</h3>
+                <div class="chart-placeholder">
+                    🥧 Gráfico circular
+                    <br><br>
+                    <strong>Corriente:</strong> 45%<br>
+                    <strong>Ahorros:</strong> 35%<br>
+                    <strong>Plazo Fijo:</strong> 20%
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividades recientes y alertas -->
+        <div class="activities-section">
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3>Actividad Reciente del Sistema</h3>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">💳</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Nueva cuenta creada</div>
+                            <div class="activity-description">Cliente: María Rodríguez - Cuenta Ahorros</div>
+                        </div>
+                        <div class="activity-time">Hace 15 min</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">🔒</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Tarjeta bloqueada</div>
+                            <div class="activity-description">Tarjeta ****1234 bloqueada por seguridad</div>
+                        </div>
+                        <div class="activity-time">Hace 32 min</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">💰</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Transferencia SWIFT</div>
+                            <div class="activity-description">$5,000 a Bank of America - Procesada</div>
+                        </div>
+                        <div class="activity-time">Hace 1 hora</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">⚠️</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Alerta KYC</div>
+                            <div class="activity-description">Cliente Juan Pérez requiere actualización</div>
+                        </div>
+                        <div class="activity-time">Hace 2 horas</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">🏠</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Préstamo aprobado</div>
+                            <div class="activity-description">Hipotecario por ₡25M - Ana García</div>
+                        </div>
+                        <div class="activity-time">Hace 3 horas</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3>Alertas de Seguridad</h3>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">🚨</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Múltiples intentos de login</div>
+                            <div class="activity-description">IP: 192.168.1.100 - Requiere investigación</div>
+                        </div>
+                        <div class="activity-time">Hace 10 min</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">💸</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Transacción inusual</div>
+                            <div class="activity-description">₡500,000 - Patrón no habitual detectado</div>
+                        </div>
+                        <div class="activity-time">Hace 25 min</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">🌍</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Acceso desde nueva ubicación</div>
+                            <div class="activity-description">Cliente conectado desde Nueva York</div>
+                        </div>
+                        <div class="activity-time">Hace 1 hora</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado del sistema -->
+        <div class="quick-actions" style="margin-top: 2rem;">
+            <h3>Estado del Sistema</h3>
+            <div class="system-status">
+                <div class="status-item">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Core Bancario</strong><br>
+                    <small>Operativo</small>
+                </div>
+                <div class="status-item">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Red SWIFT</strong><br>
+                    <small>Conectado</small>
+                </div>
+                <div class="status-item">
+                    <span class="status-indicator status-warning"></span>
+                    <strong>Sistema SINPE</strong><br>
+                    <small>Mantenimiento</small>
+                </div>
+                <div class="status-item">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Portal Web</strong><br>
+                    <small>Operativo</small>
+                </div>
+                <div class="status-item">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Base de Datos</strong><br>
+                    <small>Óptimo</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar fecha actual
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-CR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        function generateReport() {
+            alert('Generando reporte ejecutivo...');
+        }
+
+        function systemSettings() {
+            alert('Accediendo a configuración del sistema...');
+        }
+
+        function viewAuditLog() {
+            alert('Mostrando log de auditoría...');
+        }
+
+        // Actualizar estadísticas cada 30 segundos (simulación)
+        setInterval(() => {
+            console.log('Actualizando estadísticas del dashboard...');
+            // Aquí se actualizarían las estadísticas en tiempo real
+        }, 30000);
+
+        // Simular notificaciones en tiempo real
+        setTimeout(() => {
+            if (confirm('Nueva alerta de seguridad: Transacción sospechosa detectada. ¿Desea revisar ahora?')) {
+                alert('Redirigiendo al módulo de alertas...');
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

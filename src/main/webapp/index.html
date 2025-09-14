@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BancoSeguro - Sistema Bancario</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .access-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .features {
+            margin-top: 3rem;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+        }
+
+        .feature-text {
+            color: #555;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏦</div>
+        <h1>BancoSeguro</h1>
+        <p class="subtitle">Tu banco digital de confianza</p>
+
+        <div class="access-buttons">
+            <a href="login.html" class="btn btn-primary">
+                🔐 Acceso al Sistema
+            </a>
+            <a href="indexCliente.html" class="btn btn-secondary">
+                👤 Portal Cliente (Demo)
+            </a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">💳</div>
+                <div class="feature-text">Gestión completa de cuentas y tarjetas</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💸</div>
+                <div class="feature-text">Transferencias nacionales e internacionales</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🏠</div>
+                <div class="feature-text">Préstamos y servicios financieros</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-text">Seguridad avanzada con MFA</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">Reportes y análisis financieros</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👨‍💼</div>
+                <div class="feature-text">Panel administrativo completo</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 BancoSeguro. Sistema Bancario Integral.</p>
+            <p>Desarrollado con tecnologías web modernas.</p>
+        </div>
+    </div>
+
+    <script>
+        // Verificar si hay una sesión activa y redireccionar
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/auth/session');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        // Usuario ya autenticado, redireccionar según el tipo
+                        const redirectUrl = data.userType === 'admin' ?
+                            '/admin/adminDashboard.html' : '/indexCliente.html';
+                        window.location.href = redirectUrl;
+                    }
+                }
+            } catch (error) {
+                // No hacer nada si no hay conexión con el servidor
+                console.log('No hay sesión activa o servidor no disponible');
+            }
+        });
+    </script>
+</body>
+</html>

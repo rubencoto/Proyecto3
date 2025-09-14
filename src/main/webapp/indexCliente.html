@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Cliente - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .welcome-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .quick-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <div class="user-menu">
+            <span>Bienvenido, Cliente</span>
+            <a href="login.html" class="logout-btn">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="welcome-section">
+            <h2>Panel de Cliente</h2>
+            <p>Bienvenido a su portal bancario. Desde aquí puede acceder a todos sus servicios financieros.</p>
+        </div>
+
+        <div class="quick-info">
+            <div class="info-card">
+                <h4>Saldo Disponible</h4>
+                <div class="amount">₡1,250,750.00</div>
+            </div>
+            <div class="info-card">
+                <h4>Cuentas Activas</h4>
+                <div class="amount">3</div>
+            </div>
+            <div class="info-card">
+                <h4>Tarjetas</h4>
+                <div class="amount">2</div>
+            </div>
+            <div class="info-card">
+                <h4>Préstamos</h4>
+                <div class="amount">1</div>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card" onclick="window.location.href='misCuentas.html'">
+                <div class="service-icon">💳</div>
+                <h3>Mis Cuentas</h3>
+                <p>Consulte el estado de sus cuentas bancarias</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='transferencias.html'">
+                <div class="service-icon">💸</div>
+                <h3>Transferencias</h3>
+                <p>Realice transferencias nacionales e internacionales</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='tarjetas.html'">
+                <div class="service-icon">💎</div>
+                <h3>Tarjetas</h3>
+                <p>Gestione sus tarjetas de débito y crédito</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='prestamos.html'">
+                <div class="service-icon">🏠</div>
+                <h3>Préstamos</h3>
+                <p>Consulte y gestione sus préstamos</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='limites-alertas.html'">
+                <div class="service-icon">⚠️</div>
+                <h3>Límites y Alertas</h3>
+                <p>Configure límites de transacciones y alertas</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='reportesCliente.html'">
+                <div class="service-icon">📊</div>
+                <h3>Reportes</h3>
+                <p>Genere reportes de sus movimientos</p>
+            </div>
+
+            <div class="service-card" onclick="window.location.href='historial-swift.html'">
+                <div class="service-icon">🌍</div>
+                <h3>Historial SWIFT</h3>
+                <p>Consulte sus transferencias internacionales</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de datos dinámicos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aquí se pueden cargar datos reales del servidor
+            console.log('Portal cliente cargado');
+        });
+    </script>
+</body>
+</html>

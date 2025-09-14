@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cuentas - BancoSeguro Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-info {
+            background: #3182ce;
+            color: white;
+        }
+
+        .accounts-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        .account-number {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .balance-positive {
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .balance-negative {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-frozen {
+            background: #bee3f8;
+            color: #2a4365;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-closed {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+        }
+
+        .amount-in {
+            color: #38a169;
+        }
+
+        .amount-out {
+            color: #e53e3e;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="adminDashboard.html">Dashboard</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="cuentas.html" class="active">Cuentas</a>
+            <a href="gestionKyc.html">KYC</a>
+            <a href="../login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h2>Gestión de Cuentas</h2>
+                <p>Administre todas las cuentas bancarias del sistema</p>
+            </div>
+            <button class="btn btn-primary" onclick="showCreateAccountModal()">
+                ➕ Nueva Cuenta
+            </button>
+        </div>
+
+        <!-- Estadísticas de cuentas -->
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-number">23,456</div>
+                <div class="stat-text">Total Cuentas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">22,891</div>
+                <div class="stat-text">Activas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">432</div>
+                <div class="stat-text">Congeladas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">133</div>
+                <div class="stat-text">Cerradas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">₡8.4B</div>
+                <div class="stat-text">Total Depósitos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">₡2.1B</div>
+                <div class="stat-text">Total Préstamos</div>
+            </div>
+        </div>
+
+        <!-- Gráfico de resumen -->
+        <div class="chart-container">
+            <h3>Evolución de Saldos por Tipo de Cuenta</h3>
+            <div class="chart-placeholder">
+                📊 Gráfico de barras - Evolución mensual de saldos
+                <br><small>Cuentas Corrientes, Ahorros, Plazo Fijo, Moneda Extranjera</small>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <h3 style="margin-bottom: 1rem;">Filtros de Búsqueda</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="searchAccount">Número de Cuenta:</label>
+                    <input type="text" id="searchAccount" placeholder="CR05...">
+                </div>
+                <div class="form-group">
+                    <label for="clientFilter">Cliente:</label>
+                    <input type="text" id="clientFilter" placeholder="Nombre o ID cliente">
+                </div>
+                <div class="form-group">
+                    <label for="accountTypeFilter">Tipo de Cuenta:</label>
+                    <select id="accountTypeFilter">
+                        <option value="">Todos los tipos</option>
+                        <option value="corriente">Corriente</option>
+                        <option value="ahorros">Ahorros</option>
+                        <option value="plazo_fijo">Plazo Fijo</option>
+                        <option value="usd">Moneda Extranjera</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="statusAccountFilter">Estado:</label>
+                    <select id="statusAccountFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="active">Activa</option>
+                        <option value="frozen">Congelada</option>
+                        <option value="closed">Cerrada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="balanceMin">Saldo mínimo:</label>
+                    <input type="number" id="balanceMin" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="searchAccounts()">🔍 Buscar</button>
+                        <button class="btn btn-warning" onclick="clearAccountFilters()">🔄 Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de cuentas -->
+        <div class="accounts-table">
+            <div class="table-header">
+                <h3>Lista de Cuentas</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-info" onclick="exportAccounts()">📊 Exportar</button>
+                    <button class="btn btn-warning" onclick="bulkAccountActions()">⚡ Acciones Masivas</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" onchange="selectAllAccounts(this)"></th>
+                        <th>Número de Cuenta</th>
+                        <th>Cliente</th>
+                        <th>Tipo</th>
+                        <th>Moneda</th>
+                        <th>Saldo Actual</th>
+                        <th>Estado</th>
+                        <th>Fecha Apertura</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="account-check" value="CR05015108410026012345"></td>
+                        <td class="account-number">CR05015108410026012345</td>
+                        <td>María Rodríguez Jiménez</td>
+                        <td>Corriente</td>
+                        <td>CRC</td>
+                        <td class="balance-positive">₡1,250,750.00</td>
+                        <td><span class="status-active">Activa</span></td>
+                        <td>15/03/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewAccount('CR05015108410026012345')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editAccount('CR05015108410026012345')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="freezeAccount('CR05015108410026012345')">❄️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="account-check" value="CR05015108410026067890"></td>
+                        <td class="account-number">CR05015108410026067890</td>
+                        <td>María Rodríguez Jiménez</td>
+                        <td>Ahorros</td>
+                        <td>CRC</td>
+                        <td class="balance-positive">₡850,300.50</td>
+                        <td><span class="status-active">Activa</span></td>
+                        <td>20/01/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewAccount('CR05015108410026067890')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editAccount('CR05015108410026067890')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="freezeAccount('CR05015108410026067890')">❄️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="account-check" value="CR05015108410026098765"></td>
+                        <td class="account-number">CR05015108410026098765</td>
+                        <td>Juan Carlos Pérez Soto</td>
+                        <td>USD</td>
+                        <td>USD</td>
+                        <td class="balance-positive">$2,150.75</td>
+                        <td><span class="status-active">Activa</span></td>
+                        <td>10/06/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewAccount('CR05015108410026098765')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editAccount('CR05015108410026098765')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="freezeAccount('CR05015108410026098765')">❄️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="account-check" value="CR05015108410026123456"></td>
+                        <td class="account-number">CR05015108410026123456</td>
+                        <td>Ana Patricia Morales Vega</td>
+                        <td>Corriente</td>
+                        <td>CRC</td>
+                        <td class="balance-negative">-₡15,250.00</td>
+                        <td><span class="status-frozen">Congelada</span></td>
+                        <td>05/02/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewAccount('CR05015108410026123456')">👁️</button>
+                            <button class="action-btn btn-success" onclick="unfreezeAccount('CR05015108410026123456')">🔓</button>
+                            <button class="action-btn btn-danger" onclick="closeAccount('CR05015108410026123456')">❌</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="account-check" value="CR05015108410026789012"></td>
+                        <td class="account-number">CR05015108410026789012</td>
+                        <td>Roberto Antonio Vargas López</td>
+                        <td>Plazo Fijo</td>
+                        <td>CRC</td>
+                        <td class="balance-positive">₡2,500,000.00</td>
+                        <td><span class="status-active">Activa</span></td>
+                        <td>18/08/2024</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewAccount('CR05015108410026789012')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="editAccount('CR05015108410026789012')">✏️</button>
+                            <button class="action-btn btn-warning" onclick="renewDeposit('CR05015108410026789012')">🔄</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de cuenta -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAccountModal()">&times;</span>
+            <h3>Detalles de la Cuenta</h3>
+
+            <div class="modal-tabs">
+                <button class="tab-btn active" onclick="showTab('info')">Información</button>
+                <button class="tab-btn" onclick="showTab('movements')">Movimientos</button>
+                <button class="tab-btn" onclick="showTab('limits')">Límites</button>
+                <button class="tab-btn" onclick="showTab('history')">Historial</button>
+            </div>
+
+            <div id="info-tab" class="tab-content active">
+                <h4>Información de la Cuenta</h4>
+                <div class="info-grid" id="accountInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div id="movements-tab" class="tab-content">
+                <h4>Últimos Movimientos</h4>
+                <div id="movementsInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div id="limits-tab" class="tab-content">
+                <h4>Límites y Restricciones</h4>
+                <div id="limitsInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <h4>Historial de Cambios</h4>
+                <div id="historyInfo">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchAccounts() {
+            const searchAccount = document.getElementById('searchAccount').value;
+            alert(`Buscando cuentas: "${searchAccount}"`);
+        }
+
+        function clearAccountFilters() {
+            document.getElementById('searchAccount').value = '';
+            document.getElementById('clientFilter').value = '';
+            document.getElementById('accountTypeFilter').value = '';
+            document.getElementById('statusAccountFilter').value = '';
+            document.getElementById('balanceMin').value = '';
+            alert('Filtros limpiados');
+        }
+
+        function viewAccount(accountNumber) {
+            // Datos simulados
+            const accountData = {
+                number: accountNumber,
+                client: 'María Rodríguez Jiménez',
+                type: 'Cuenta Corriente',
+                currency: 'CRC',
+                balance: '₡1,250,750.00',
+                openDate: '15/03/2024',
+                status: 'Activa',
+                branch: 'Sucursal San José Centro',
+                officer: 'Luis González - Ejecutivo'
+            };
+
+            document.getElementById('accountInfo').innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Número de Cuenta</div>
+                    <div class="info-value">${accountData.number}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Cliente</div>
+                    <div class="info-value">${accountData.client}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tipo</div>
+                    <div class="info-value">${accountData.type}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Moneda</div>
+                    <div class="info-value">${accountData.currency}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Saldo Actual</div>
+                    <div class="info-value">${accountData.balance}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Estado</div>
+                    <div class="info-value">${accountData.status}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Fecha Apertura</div>
+                    <div class="info-value">${accountData.openDate}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Sucursal</div>
+                    <div class="info-value">${accountData.branch}</div>
+                </div>
+            `;
+
+            // Simular movimientos
+            document.getElementById('movementsInfo').innerHTML = `
+                <div class="transaction-item">
+                    <div>
+                        <strong>14/09/2025</strong><br>
+                        <small>Transferencia SINPE</small>
+                    </div>
+                    <div class="transaction-amount amount-out">-₡50,000.00</div>
+                </div>
+                <div class="transaction-item">
+                    <div>
+                        <strong>13/09/2025</strong><br>
+                        <small>Depósito directo</small>
+                    </div>
+                    <div class="transaction-amount amount-in">+₡180,000.00</div>
+                </div>
+                <div class="transaction-item">
+                    <div>
+                        <strong>12/09/2025</strong><br>
+                        <small>Compra POS</small>
+                    </div>
+                    <div class="transaction-amount amount-out">-₡25,750.00</div>
+                </div>
+            `;
+
+            document.getElementById('accountModal').style.display = 'block';
+        }
+
+        function closeAccountModal() {
+            document.getElementById('accountModal').style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function editAccount(accountNumber) {
+            alert(`Editando cuenta: ${accountNumber}`);
+        }
+
+        function freezeAccount(accountNumber) {
+            if (confirm(`¿Está seguro que desea congelar la cuenta ${accountNumber}?`)) {
+                alert(`Cuenta ${accountNumber} congelada exitosamente`);
+            }
+        }
+
+        function unfreezeAccount(accountNumber) {
+            if (confirm(`¿Desea descongelar la cuenta ${accountNumber}?`)) {
+                alert(`Cuenta ${accountNumber} activada exitosamente`);
+            }
+        }
+
+        function closeAccount(accountNumber) {
+            if (confirm(`¿Está seguro que desea cerrar permanentemente la cuenta ${accountNumber}?`)) {
+                const reason = prompt('Motivo del cierre:');
+                if (reason) {
+                    alert(`Cuenta ${accountNumber} cerrada. Motivo: ${reason}`);
+                }
+            }
+        }
+
+        function renewDeposit(accountNumber) {
+            alert(`Procesando renovación del plazo fijo: ${accountNumber}`);
+        }
+
+        function selectAllAccounts(checkbox) {
+            const checkboxes = document.querySelectorAll('.account-check');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function showCreateAccountModal() {
+            alert('Abriendo formulario para nueva cuenta...');
+        }
+
+        function exportAccounts() {
+            alert('Exportando lista de cuentas...');
+        }
+
+        function bulkAccountActions() {
+            const selected = document.querySelectorAll('.account-check:checked');
+            if (selected.length === 0) {
+                alert('Seleccione al menos una cuenta');
+                return;
+            }
+            alert(`Ejecutar acción masiva en ${selected.length} cuentas seleccionadas`);
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('accountModal');
+            if (event.target === modal) {
+                closeAccountModal();
+            }
+        }
+    </script>
+</body>
+</html>

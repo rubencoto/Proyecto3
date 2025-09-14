@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/TareaProyecto">
+
+    <!-- Configuración del DataSource para la base de datos MySQL -->
+    <Resource name="jdbc/BancoDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="20"
+              maxIdle="10"
+              maxWaitMillis="10000"
+              username="${DB_USER:-doadmin}"
+              password="${DB_PASSWORD:-AVNS_nBSDzwc74b3zCb0tNtG}"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://${DB_HOST:-db-mysql-nyc3-21466-do-user-24289380-0.d.db.ondigitalocean.com}:${DB_PORT:-25060}/${DB_NAME:-defaultdb}?useSSL=true&amp;requireSSL=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"
+              validationQuery="SELECT 1"
+              testOnBorrow="true"
+              removeAbandonedOnBorrow="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true"/>
+
+    <!-- Mapeo JNDI para JTA -->
+    <ResourceLink name="java:/BancoDS"
+                  global="jdbc/BancoDS"
+                  type="javax.sql.DataSource"/>
+
+</Context>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial SWIFT - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .swift-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fef5e7;
+            color: #744210;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-processing {
+            background: #bee3f8;
+            color: #2a4365;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .amount-cell {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .details-button {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .details-button:hover {
+            background: #cbd5e0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .timeline {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 1rem;
+            margin-left: 1rem;
+        }
+
+        .timeline-item {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.7rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="indexCliente.html">Inicio</a>
+            <a href="transferencias.html">Transferencias</a>
+            <a href="misCuentas.html">Mis Cuentas</a>
+            <a href="login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-title">
+            <h2>Historial de Transferencias SWIFT</h2>
+            <p>Consulte el estado y detalles de sus transferencias internacionales</p>
+        </div>
+
+        <!-- Resumen -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-value">12</div>
+                <div class="summary-label">Total Transferencias</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">$24,750</div>
+                <div class="summary-label">Monto Total Enviado</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">3</div>
+                <div class="summary-label">En Proceso</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">$625</div>
+                <div class="summary-label">Comisiones Pagadas</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <h3 style="margin-bottom: 1rem;">Filtros de Búsqueda</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="dateFrom">Fecha desde:</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                <div class="form-group">
+                    <label for="dateTo">Fecha hasta:</label>
+                    <input type="date" id="dateTo">
+                </div>
+                <div class="form-group">
+                    <label for="statusFilter">Estado:</label>
+                    <select id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="completed">Completada</option>
+                        <option value="processing">En proceso</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="rejected">Rechazada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amountMin">Monto mínimo:</label>
+                    <input type="number" id="amountMin" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="bankFilter">Banco destino:</label>
+                    <input type="text" id="bankFilter" placeholder="Nombre del banco">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="applyFilters()">Buscar</button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de transferencias -->
+        <div class="swift-table">
+            <div class="table-header">
+                <h3>Transferencias SWIFT</h3>
+                <button class="btn btn-secondary" onclick="exportData()">Exportar</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Referencia</th>
+                        <th>Banco Destino</th>
+                        <th>Beneficiario</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="swiftTableBody">
+                    <tr>
+                        <td>12/09/2025</td>
+                        <td>SWIFT240912001</td>
+                        <td>Bank of America</td>
+                        <td>John Smith</td>
+                        <td class="amount-cell">$2,500.00</td>
+                        <td><span class="status-processing">En proceso</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240912001')">Ver detalles</button></td>
+                    </tr>
+                    <tr>
+                        <td>08/09/2025</td>
+                        <td>SWIFT240908001</td>
+                        <td>Santander España</td>
+                        <td>María García</td>
+                        <td class="amount-cell">$1,200.00</td>
+                        <td><span class="status-completed">Completada</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240908001')">Ver detalles</button></td>
+                    </tr>
+                    <tr>
+                        <td>05/09/2025</td>
+                        <td>SWIFT240905001</td>
+                        <td>HSBC Hong Kong</td>
+                        <td>Chen Wei</td>
+                        <td class="amount-cell">$3,750.00</td>
+                        <td><span class="status-completed">Completada</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240905001')">Ver detalles</button></td>
+                    </tr>
+                    <tr>
+                        <td>02/09/2025</td>
+                        <td>SWIFT240902001</td>
+                        <td>Deutsche Bank</td>
+                        <td>Hans Mueller</td>
+                        <td class="amount-cell">$850.00</td>
+                        <td><span class="status-rejected">Rechazada</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240902001')">Ver detalles</button></td>
+                    </tr>
+                    <tr>
+                        <td>28/08/2025</td>
+                        <td>SWIFT240828001</td>
+                        <td>Citibank New York</td>
+                        <td>Robert Johnson</td>
+                        <td class="amount-cell">$5,200.00</td>
+                        <td><span class="status-completed">Completada</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240828001')">Ver detalles</button></td>
+                    </tr>
+                    <tr>
+                        <td>25/08/2025</td>
+                        <td>SWIFT240825001</td>
+                        <td>BNP Paribas</td>
+                        <td>Pierre Dubois</td>
+                        <td class="amount-cell">$1,890.00</td>
+                        <td><span class="status-pending">Pendiente</span></td>
+                        <td><button class="details-button" onclick="showSwiftDetails('SWIFT240825001')">Ver detalles</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination">
+            <button onclick="changePage(1)">1</button>
+            <button onclick="changePage(2)" class="active">2</button>
+            <button onclick="changePage(3)">3</button>
+            <button onclick="changePage(4)">4</button>
+        </div>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div id="swiftModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSwiftModal()">&times;</span>
+            <h3>Detalles de Transferencia SWIFT</h3>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Referencia</div>
+                    <div class="detail-value" id="modalReference"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estado</div>
+                    <div class="detail-value" id="modalStatus"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Monto</div>
+                    <div class="detail-value" id="modalAmount"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Comisión</div>
+                    <div class="detail-value" id="modalFee"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Banco Beneficiario</div>
+                    <div class="detail-value" id="modalBank"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Código SWIFT</div>
+                    <div class="detail-value" id="modalSwiftCode"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Beneficiario</div>
+                    <div class="detail-value" id="modalBeneficiary"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Cuenta Beneficiario</div>
+                    <div class="detail-value" id="modalAccount"></div>
+                </div>
+            </div>
+
+            <h4>Cronología de la Transferencia</h4>
+            <div class="timeline" id="modalTimeline">
+                <!-- Timeline items will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos simulados para los detalles de las transferencias
+        const swiftData = {
+            'SWIFT240912001': {
+                reference: 'SWIFT240912001',
+                status: 'En proceso',
+                amount: '$2,500.00',
+                fee: '$25.00',
+                bank: 'Bank of America, N.A.',
+                swiftCode: 'BOFAUS3N',
+                beneficiary: 'John Smith',
+                account: '123456789012',
+                timeline: [
+                    { date: '12/09/2025 10:30', title: 'Transferencia iniciada', description: 'Orden de transferencia recibida y validada' },
+                    { date: '12/09/2025 11:15', title: 'Enviado al banco corresponsal', description: 'Transferencia enviada a través de la red SWIFT' },
+                    { date: '13/09/2025 09:00', title: 'En proceso', description: 'Banco corresponsal procesando la transferencia' }
+                ]
+            },
+            'SWIFT240908001': {
+                reference: 'SWIFT240908001',
+                status: 'Completada',
+                amount: '$1,200.00',
+                fee: '$25.00',
+                bank: 'Banco Santander España',
+                swiftCode: 'BSCHESMM',
+                beneficiary: 'María García López',
+                account: 'ES9121000418450200051332',
+                timeline: [
+                    { date: '08/09/2025 14:20', title: 'Transferencia iniciada', description: 'Orden de transferencia recibida y validada' },
+                    { date: '08/09/2025 14:45', title: 'Enviado al banco corresponsal', description: 'Transferencia enviada a través de la red SWIFT' },
+                    { date: '09/09/2025 08:30', title: 'Procesado por banco destino', description: 'Banco Santander procesó la transferencia' },
+                    { date: '09/09/2025 10:15', title: 'Completada', description: 'Fondos acreditados en cuenta del beneficiario' }
+                ]
+            }
+        };
+
+        // Establecer fechas por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+            document.getElementById('dateFrom').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+        });
+
+        function showSwiftDetails(reference) {
+            let data = swiftData[reference];
+
+            if (!data) {
+                // Datos por defecto si no se encuentra la referencia
+                data = {
+                    reference: reference,
+                    status: 'En proceso',
+                    amount: '$1,000.00',
+                    fee: '$25.00',
+                    bank: 'Banco Internacional',
+                    swiftCode: 'INTLUS33',
+                    beneficiary: 'Cliente Internacional',
+                    account: '1234567890',
+                    timeline: [
+                        { date: new Date().toLocaleDateString(), title: 'Transferencia iniciada', description: 'Orden procesada exitosamente' }
+                    ]
+                };
+            }
+
+            // Llenar el modal con los datos
+            document.getElementById('modalReference').textContent = data.reference;
+            document.getElementById('modalStatus').textContent = data.status;
+            document.getElementById('modalAmount').textContent = data.amount;
+            document.getElementById('modalFee').textContent = data.fee;
+            document.getElementById('modalBank').textContent = data.bank;
+            document.getElementById('modalSwiftCode').textContent = data.swiftCode;
+            document.getElementById('modalBeneficiary').textContent = data.beneficiary;
+            document.getElementById('modalAccount').textContent = data.account;
+
+            // Crear timeline
+            const timeline = document.getElementById('modalTimeline');
+            timeline.innerHTML = '';
+
+            data.timeline.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-date">${item.date}</div>
+                    <div class="timeline-title">${item.title}</div>
+                    <div class="timeline-description">${item.description}</div>
+                `;
+                timeline.appendChild(timelineItem);
+            });
+
+            document.getElementById('swiftModal').style.display = 'block';
+        }
+
+        function closeSwiftModal() {
+            document.getElementById('swiftModal').style.display = 'none';
+        }
+
+        function applyFilters() {
+            alert('Aplicando filtros...');
+            // Aquí se implementaría la lógica de filtrado
+        }
+
+        function clearFilters() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('amountMin').value = '';
+            document.getElementById('bankFilter').value = '';
+            alert('Filtros limpiados');
+        }
+
+        function exportData() {
+            alert('Exportando datos de transferencias SWIFT...');
+            // Aquí se implementaría la exportación
+        }
+
+        function changePage(page) {
+            // Actualizar botones de paginación
+            document.querySelectorAll('.pagination button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            alert(`Cargando página ${page}...`);
+            // Aquí se implementaría la carga de datos de la página
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('swiftModal');
+            if (event.target === modal) {
+                closeSwiftModal();
+            }
+        }
+    </script>
+</body>
+</html>

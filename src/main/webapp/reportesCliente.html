@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .report-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-content {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .recent-reports {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .status-ready {
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .status-processing {
+            color: #d69e2e;
+            font-weight: bold;
+        }
+
+        .download-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="indexCliente.html">Inicio</a>
+            <a href="misCuentas.html">Mis Cuentas</a>
+            <a href="transferencias.html">Transferencias</a>
+            <a href="login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-title">
+            <h2>Reportes y Análisis</h2>
+            <p>Genere reportes detallados de sus movimientos y analice sus patrones financieros</p>
+        </div>
+
+        <!-- Estadísticas Rápidas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">₡2,856,430</div>
+                <div class="stat-label">Ingresos del Mes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">₡1,245,750</div>
+                <div class="stat-label">Gastos del Mes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">47</div>
+                <div class="stat-label">Transacciones</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">₡1,610,680</div>
+                <div class="stat-label">Balance Neto</div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Movimientos -->
+        <div class="chart-container">
+            <h3 style="margin-bottom: 1rem;">Movimientos de los Últimos 6 Meses</h3>
+            <div class="chart-placeholder">
+                📊 Gráfico de Ingresos vs Gastos
+                <br><small>Aquí se mostraría un gráfico interactivo con Chart.js o similar</small>
+            </div>
+        </div>
+
+        <!-- Generadores de Reportes -->
+        <div class="reports-grid">
+            <!-- Estado de Cuenta -->
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon">📄</div>
+                    <h3>Estado de Cuenta</h3>
+                </div>
+                <div class="report-content">
+                    <form onsubmit="generateAccountStatement(event)">
+                        <div class="form-group">
+                            <label for="accountSelect">Cuenta:</label>
+                            <select id="accountSelect" required>
+                                <option value="">Seleccione una cuenta</option>
+                                <option value="CR05015108410026012345">CR05...012345 - Corriente</option>
+                                <option value="CR05015108410026067890">CR05...067890 - Ahorros</option>
+                                <option value="CR05015108410026098765">CR05...098765 - USD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fromDate">Fecha desde:</label>
+                            <input type="date" id="fromDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="toDate">Fecha hasta:</label>
+                            <input type="date" id="toDate" required>
+                        </div>
+                        <button type="submit" class="btn">Generar Estado</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reporte de Movimientos -->
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon">📊</div>
+                    <h3>Reporte de Movimientos</h3>
+                </div>
+                <div class="report-content">
+                    <form onsubmit="generateMovementsReport(event)">
+                        <div class="form-group">
+                            <label for="movementType">Tipo de movimiento:</label>
+                            <select id="movementType" required>
+                                <option value="">Todos los movimientos</option>
+                                <option value="ingresos">Solo ingresos</option>
+                                <option value="gastos">Solo gastos</option>
+                                <option value="transferencias">Transferencias</option>
+                                <option value="tarjetas">Tarjetas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportPeriod">Período:</label>
+                            <select id="reportPeriod" required>
+                                <option value="7days">Últimos 7 días</option>
+                                <option value="1month">Último mes</option>
+                                <option value="3months">Últimos 3 meses</option>
+                                <option value="6months">Últimos 6 meses</option>
+                                <option value="1year">Último año</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="format">Formato:</label>
+                            <select id="format" required>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Generar Reporte</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Análisis de Gastos -->
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon">💰</div>
+                    <h3>Análisis de Gastos</h3>
+                </div>
+                <div class="report-content">
+                    <form onsubmit="generateExpenseAnalysis(event)">
+                        <div class="form-group">
+                            <label for="analysisType">Tipo de análisis:</label>
+                            <select id="analysisType" required>
+                                <option value="category">Por categoría</option>
+                                <option value="merchant">Por comercio</option>
+                                <option value="monthly">Tendencia mensual</option>
+                                <option value="comparison">Comparativo anual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="analysisMonth">Mes:</label>
+                            <select id="analysisMonth" required>
+                                <option value="current">Mes actual</option>
+                                <option value="previous">Mes anterior</option>
+                                <option value="ytd">Año a la fecha</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="includeCards">Incluir tarjetas:</label>
+                            <select id="includeCards" required>
+                                <option value="all">Todas las tarjetas</option>
+                                <option value="credit">Solo crédito</option>
+                                <option value="debit">Solo débito</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Generar Análisis</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Certificaciones -->
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon">📜</div>
+                    <h3>Certificaciones</h3>
+                </div>
+                <div class="report-content">
+                    <form onsubmit="generateCertificate(event)">
+                        <div class="form-group">
+                            <label for="certificateType">Tipo de certificado:</label>
+                            <select id="certificateType" required>
+                                <option value="">Seleccione tipo</option>
+                                <option value="saldos">Certificado de saldos</option>
+                                <option value="ingresos">Certificado de ingresos</option>
+                                <option value="referencia">Carta de referencia</option>
+                                <option value="patrimonio">Certificado patrimonial</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="certPurpose">Propósito:</label>
+                            <select id="certPurpose" required>
+                                <option value="">Seleccione propósito</option>
+                                <option value="visa">Trámite de visa</option>
+                                <option value="loan">Solicitud de préstamo</option>
+                                <option value="employment">Trámite laboral</option>
+                                <option value="other">Otros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="language">Idioma:</label>
+                            <select id="language" required>
+                                <option value="es">Español</option>
+                                <option value="en">Inglés</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Solicitar Certificado</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Avanzados -->
+        <div class="filter-section">
+            <h3 style="margin-bottom: 1rem;">Filtros Avanzados</h3>
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="filterAccount">Cuenta:</label>
+                    <select id="filterAccount">
+                        <option value="">Todas las cuentas</option>
+                        <option value="CR05015108410026012345">Cuenta Corriente</option>
+                        <option value="CR05015108410026067890">Cuenta Ahorros</option>
+                        <option value="CR05015108410026098765">Cuenta USD</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterAmount">Monto mínimo:</label>
+                    <input type="number" id="filterAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="filterCategory">Categoría:</label>
+                    <select id="filterCategory">
+                        <option value="">Todas las categorías</option>
+                        <option value="food">Alimentación</option>
+                        <option value="transport">Transporte</option>
+                        <option value="entertainment">Entretenimiento</option>
+                        <option value="utilities">Servicios públicos</option>
+                        <option value="shopping">Compras</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="applyFilters()">Aplicar Filtros</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reportes Recientes -->
+        <div class="recent-reports">
+            <div class="table-header">
+                <h3>Reportes Generados Recientemente</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo de Reporte</th>
+                        <th>Período</th>
+                        <th>Estado</th>
+                        <th>Descarga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>14/09/2025</td>
+                        <td>Estado de Cuenta</td>
+                        <td>Agosto 2025</td>
+                        <td class="status-ready">Listo</td>
+                        <td><a href="#" class="download-link" onclick="downloadReport('estado_agosto_2025.pdf')">Descargar PDF</a></td>
+                    </tr>
+                    <tr>
+                        <td>12/09/2025</td>
+                        <td>Análisis de Gastos</td>
+                        <td>Últimos 3 meses</td>
+                        <td class="status-ready">Listo</td>
+                        <td><a href="#" class="download-link" onclick="downloadReport('analisis_gastos_3m.xlsx')">Descargar Excel</a></td>
+                    </tr>
+                    <tr>
+                        <td>10/09/2025</td>
+                        <td>Certificado de Saldos</td>
+                        <td>Septiembre 2025</td>
+                        <td class="status-processing">Procesando</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>08/09/2025</td>
+                        <td>Reporte de Movimientos</td>
+                        <td>Último mes</td>
+                        <td class="status-ready">Listo</td>
+                        <td><a href="#" class="download-link" onclick="downloadReport('movimientos_mes.csv')">Descargar CSV</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Establecer fechas por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+            document.getElementById('fromDate').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('toDate').value = today.toISOString().split('T')[0];
+        });
+
+        function generateAccountStatement(event) {
+            event.preventDefault();
+            const account = document.getElementById('accountSelect').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (!account) {
+                alert('Por favor seleccione una cuenta');
+                return;
+            }
+
+            alert(`Generando estado de cuenta para ${account} del ${fromDate} al ${toDate}`);
+            // Aquí se implementaría la generación del reporte
+        }
+
+        function generateMovementsReport(event) {
+            event.preventDefault();
+            const type = document.getElementById('movementType').value || 'todos';
+            const period = document.getElementById('reportPeriod').value;
+            const format = document.getElementById('format').value;
+
+            alert(`Generando reporte de ${type} para ${period} en formato ${format}`);
+        }
+
+        function generateExpenseAnalysis(event) {
+            event.preventDefault();
+            const analysisType = document.getElementById('analysisType').value;
+            const month = document.getElementById('analysisMonth').value;
+            const cards = document.getElementById('includeCards').value;
+
+            alert(`Generando análisis ${analysisType} para ${month} incluyendo ${cards}`);
+        }
+
+        function generateCertificate(event) {
+            event.preventDefault();
+            const certType = document.getElementById('certificateType').value;
+            const purpose = document.getElementById('certPurpose').value;
+            const language = document.getElementById('language').value;
+
+            if (!certType || !purpose) {
+                alert('Por favor complete todos los campos requeridos');
+                return;
+            }
+
+            alert(`Solicitando ${certType} para ${purpose} en ${language}. Estará listo en 24-48 horas.`);
+        }
+
+        function applyFilters() {
+            const account = document.getElementById('filterAccount').value;
+            const amount = document.getElementById('filterAmount').value;
+            const category = document.getElementById('filterCategory').value;
+
+            alert('Filtros aplicados. Actualizando vista...');
+            // Aquí se implementaría la aplicación de filtros
+        }
+
+        function downloadReport(filename) {
+            alert(`Descargando ${filename}...`);
+            // Aquí se implementaría la descarga real del archivo
+        }
+
+        // Simular actualización de estadísticas cada minuto
+        setInterval(() => {
+            console.log('Actualizando estadísticas...');
+            // Aquí se actualizarían las estadísticas en tiempo real
+        }, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Cuentas - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-title h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .accounts-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .account-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .account-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .account-type {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .account-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .account-balance {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .account-details {
+            padding: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .account-actions {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .movements-section {
+            margin-top: 2rem;
+        }
+
+        .movements-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-header h3 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .amount-positive {
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .amount-negative {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="indexCliente.html">Inicio</a>
+            <a href="transferencias.html">Transferencias</a>
+            <a href="tarjetas.html">Tarjetas</a>
+            <a href="login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-title">
+            <h2>Mis Cuentas</h2>
+            <p>Administre y consulte el estado de sus cuentas bancarias</p>
+        </div>
+
+        <div class="accounts-grid">
+            <!-- Cuenta Corriente -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-type">Cuenta Corriente</div>
+                    <div class="account-number">CR05015108410026012345</div>
+                    <div class="account-balance">₡1,250,750.00</div>
+                </div>
+                <div class="account-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Estado:</span>
+                        <span class="detail-value" style="color: #38a169;">Activa</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha de apertura:</span>
+                        <span class="detail-value">15/03/2023</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Límite diario:</span>
+                        <span class="detail-value">₡500,000.00</span>
+                    </div>
+                </div>
+                <div class="account-actions">
+                    <button class="btn btn-primary" onclick="viewMovements('CR05015108410026012345')">Ver Movimientos</button>
+                    <button class="btn btn-secondary" onclick="downloadStatement('CR05015108410026012345')">Descargar Estado</button>
+                </div>
+            </div>
+
+            <!-- Cuenta de Ahorros -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-type">Cuenta de Ahorros</div>
+                    <div class="account-number">CR05015108410026067890</div>
+                    <div class="account-balance">₡850,300.50</div>
+                </div>
+                <div class="account-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Estado:</span>
+                        <span class="detail-value" style="color: #38a169;">Activa</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha de apertura:</span>
+                        <span class="detail-value">20/01/2023</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tasa de interés:</span>
+                        <span class="detail-value">3.25% anual</span>
+                    </div>
+                </div>
+                <div class="account-actions">
+                    <button class="btn btn-primary" onclick="viewMovements('CR05015108410026067890')">Ver Movimientos</button>
+                    <button class="btn btn-secondary" onclick="downloadStatement('CR05015108410026067890')">Descargar Estado</button>
+                </div>
+            </div>
+
+            <!-- Cuenta USD -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-type">Cuenta en Dólares</div>
+                    <div class="account-number">CR05015108410026098765</div>
+                    <div class="account-balance">$2,150.75</div>
+                </div>
+                <div class="account-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Estado:</span>
+                        <span class="detail-value" style="color: #38a169;">Activa</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha de apertura:</span>
+                        <span class="detail-value">10/06/2023</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tipo de cambio:</span>
+                        <span class="detail-value">₡525.50</span>
+                    </div>
+                </div>
+                <div class="account-actions">
+                    <button class="btn btn-primary" onclick="viewMovements('CR05015108410026098765')">Ver Movimientos</button>
+                    <button class="btn btn-secondary" onclick="downloadStatement('CR05015108410026098765')">Descargar Estado</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="movements-section">
+            <div class="movements-table">
+                <div class="table-header">
+                    <h3>Últimos Movimientos</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>Cuenta</th>
+                            <th>Monto</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>14/09/2025</td>
+                            <td>Transferencia SINPE</td>
+                            <td>CR05...012345</td>
+                            <td class="amount-negative">-₡50,000.00</td>
+                            <td>₡1,250,750.00</td>
+                        </tr>
+                        <tr>
+                            <td>13/09/2025</td>
+                            <td>Depósito directo</td>
+                            <td>CR05...012345</td>
+                            <td class="amount-positive">+₡180,000.00</td>
+                            <td>₡1,300,750.00</td>
+                        </tr>
+                        <tr>
+                            <td>12/09/2025</td>
+                            <td>Compra con tarjeta</td>
+                            <td>CR05...012345</td>
+                            <td class="amount-negative">-₡25,750.00</td>
+                            <td>₡1,120,750.00</td>
+                        </tr>
+                        <tr>
+                            <td>11/09/2025</td>
+                            <td>Intereses ganados</td>
+                            <td>CR05...067890</td>
+                            <td class="amount-positive">+₡2,300.50</td>
+                            <td>₡850,300.50</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function viewMovements(accountNumber) {
+            alert(`Ver movimientos detallados de la cuenta: ${accountNumber}`);
+            // Aquí se implementaría la navegación a una página de movimientos detallados
+        }
+
+        function downloadStatement(accountNumber) {
+            alert(`Descargando estado de cuenta para: ${accountNumber}`);
+            // Aquí se implementaría la descarga del estado de cuenta
+        }
+
+        // Actualizar datos en tiempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de cuentas cargada');
+            // Aquí se pueden cargar datos reales del servidor
+        });
+    </script>
+</body>
+</html>

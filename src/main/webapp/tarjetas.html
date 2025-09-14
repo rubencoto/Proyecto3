@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tarjetas - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .credit-card {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .credit-card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-visa {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .card-mastercard {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .card-debit {
+            background: linear-gradient(135deg, #20bf6b 0%, #01a3a4 100%);
+        }
+
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: #ffd700;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .card-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .card-holder {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .card-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-warning {
+            background: #f6ad55;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #ed8936;
+        }
+
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f56565;
+        }
+
+        .card-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-blocked {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .card-limits {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .limit-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .transactions-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .amount-spent {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="indexCliente.html">Inicio</a>
+            <a href="misCuentas.html">Mis Cuentas</a>
+            <a href="transferencias.html">Transferencias</a>
+            <a href="login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-title">
+            <h2>Mis Tarjetas</h2>
+            <p>Administre sus tarjetas de débito y crédito</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Tarjeta de Crédito Visa -->
+            <div class="card-container">
+                <div class="card-status status-active">Activa</div>
+                <div class="credit-card card-visa" onclick="showCardDetails('visa')">
+                    <div class="card-chip"></div>
+                    <div class="card-number">**** **** **** 1234</div>
+                    <div class="card-info">
+                        <div>
+                            <div class="card-holder">JUAN PÉREZ</div>
+                            <div>12/27</div>
+                        </div>
+                        <div class="card-brand">VISA</div>
+                    </div>
+                </div>
+
+                <div class="card-limits">
+                    <div class="limit-item">
+                        <span>Límite de crédito:</span>
+                        <strong>₡500,000.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Disponible:</span>
+                        <strong>₡425,750.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Saldo actual:</span>
+                        <strong>₡74,250.00</strong>
+                    </div>
+                </div>
+
+                <div class="card-controls">
+                    <button class="btn btn-primary" onclick="showLimitsModal('visa')">Límites</button>
+                    <button class="btn btn-warning" onclick="blockCard('visa')">Bloquear</button>
+                    <button class="btn btn-primary" onclick="viewStatement('visa')">Estado</button>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Crédito MasterCard -->
+            <div class="card-container">
+                <div class="card-status status-active">Activa</div>
+                <div class="credit-card card-mastercard" onclick="showCardDetails('mastercard')">
+                    <div class="card-chip"></div>
+                    <div class="card-number">**** **** **** 5678</div>
+                    <div class="card-info">
+                        <div>
+                            <div class="card-holder">JUAN PÉREZ</div>
+                            <div>08/26</div>
+                        </div>
+                        <div class="card-brand">MasterCard</div>
+                    </div>
+                </div>
+
+                <div class="card-limits">
+                    <div class="limit-item">
+                        <span>Límite de crédito:</span>
+                        <strong>₡300,000.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Disponible:</span>
+                        <strong>₡280,500.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Saldo actual:</span>
+                        <strong>₡19,500.00</strong>
+                    </div>
+                </div>
+
+                <div class="card-controls">
+                    <button class="btn btn-primary" onclick="showLimitsModal('mastercard')">Límites</button>
+                    <button class="btn btn-warning" onclick="blockCard('mastercard')">Bloquear</button>
+                    <button class="btn btn-primary" onclick="viewStatement('mastercard')">Estado</button>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Débito -->
+            <div class="card-container">
+                <div class="card-status status-active">Activa</div>
+                <div class="credit-card card-debit" onclick="showCardDetails('debit')">
+                    <div class="card-chip"></div>
+                    <div class="card-number">**** **** **** 9012</div>
+                    <div class="card-info">
+                        <div>
+                            <div class="card-holder">JUAN PÉREZ</div>
+                            <div>03/28</div>
+                        </div>
+                        <div class="card-brand">DÉBITO</div>
+                    </div>
+                </div>
+
+                <div class="card-limits">
+                    <div class="limit-item">
+                        <span>Límite diario ATM:</span>
+                        <strong>₡150,000.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Límite POS:</span>
+                        <strong>₡300,000.00</strong>
+                    </div>
+                    <div class="limit-item">
+                        <span>Cuenta asociada:</span>
+                        <strong>CR05...012345</strong>
+                    </div>
+                </div>
+
+                <div class="card-controls">
+                    <button class="btn btn-primary" onclick="showLimitsModal('debit')">Límites</button>
+                    <button class="btn btn-warning" onclick="blockCard('debit')">Bloquear</button>
+                    <button class="btn btn-primary" onclick="requestNew()">Solicitar Nueva</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transacciones Recientes -->
+        <div class="transactions-section">
+            <div class="table-header">
+                <h3>Transacciones Recientes con Tarjetas</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tarjeta</th>
+                        <th>Comercio</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>14/09/2025</td>
+                        <td>****1234</td>
+                        <td>Supermercado ABC</td>
+                        <td class="amount-spent">-₡25,500.00</td>
+                        <td>Aprobada</td>
+                    </tr>
+                    <tr>
+                        <td>13/09/2025</td>
+                        <td>****9012</td>
+                        <td>ATM Banco Nacional</td>
+                        <td class="amount-spent">-₡50,000.00</td>
+                        <td>Aprobada</td>
+                    </tr>
+                    <tr>
+                        <td>12/09/2025</td>
+                        <td>****5678</td>
+                        <td>Gasolinera Delta</td>
+                        <td class="amount-spent">-₡15,750.00</td>
+                        <td>Aprobada</td>
+                    </tr>
+                    <tr>
+                        <td>11/09/2025</td>
+                        <td>****1234</td>
+                        <td>Tienda Online XYZ</td>
+                        <td class="amount-spent">-₡48,750.00</td>
+                        <td>Aprobada</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para configurar límites -->
+    <div id="limitsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLimitsModal()">&times;</span>
+            <h3>Configurar Límites de Tarjeta</h3>
+            <form id="limitsForm" onsubmit="updateLimits(event)">
+                <div class="form-group">
+                    <label for="dailyLimit">Límite diario:</label>
+                    <input type="number" id="dailyLimit" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="monthlyLimit">Límite mensual:</label>
+                    <input type="number" id="monthlyLimit" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="atmLimit">Límite ATM:</label>
+                    <input type="number" id="atmLimit" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Actualizar Límites</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showCardDetails(cardType) {
+            alert(`Mostrando detalles de la tarjeta ${cardType}`);
+        }
+
+        function showLimitsModal(cardType) {
+            document.getElementById('limitsModal').style.display = 'block';
+            // Cargar límites actuales según el tipo de tarjeta
+            if (cardType === 'debit') {
+                document.getElementById('dailyLimit').value = 150000;
+                document.getElementById('monthlyLimit').value = 500000;
+                document.getElementById('atmLimit').value = 150000;
+            } else {
+                document.getElementById('dailyLimit').value = 100000;
+                document.getElementById('monthlyLimit').value = 300000;
+                document.getElementById('atmLimit').value = 50000;
+            }
+        }
+
+        function closeLimitsModal() {
+            document.getElementById('limitsModal').style.display = 'none';
+        }
+
+        function updateLimits(event) {
+            event.preventDefault();
+            alert('Límites actualizados exitosamente');
+            closeLimitsModal();
+        }
+
+        function blockCard(cardType) {
+            if (confirm(`¿Está seguro que desea bloquear la tarjeta ${cardType}?`)) {
+                alert(`Tarjeta ${cardType} bloqueada exitosamente`);
+                // Aquí se actualizaría el estado visual de la tarjeta
+            }
+        }
+
+        function viewStatement(cardType) {
+            alert(`Descargando estado de cuenta de la tarjeta ${cardType}`);
+        }
+
+        function requestNew() {
+            if (confirm('¿Desea solicitar una nueva tarjeta de débito?')) {
+                alert('Solicitud enviada. Recibirá su nueva tarjeta en 5-7 días hábiles.');
+            }
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('limitsModal');
+            if (event.target === modal) {
+                closeLimitsModal();
+            }
+        }
+    </script>
+</body>
+</html>

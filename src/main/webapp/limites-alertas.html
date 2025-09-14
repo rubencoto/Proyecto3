@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Límites y Alertas - BancoSeguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .section-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        .limit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .limit-info {
+            flex: 1;
+        }
+
+        .limit-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .limit-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .limit-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 1rem;
+        }
+
+        .limit-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-warning {
+            background: #f6ad55;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #ed8936;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .alert-critical {
+            background: #fed7d7;
+            border-color: #e53e3e;
+        }
+
+        .alert-warning {
+            background: #fef5e7;
+            border-color: #d69e2e;
+        }
+
+        .alert-info {
+            background: #e6fffa;
+            border-color: #319795;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .alert-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .alert-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-left: 1rem;
+        }
+
+        .notification-settings {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="indexCliente.html">Inicio</a>
+            <a href="misCuentas.html">Mis Cuentas</a>
+            <a href="transferencias.html">Transferencias</a>
+            <a href="login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-title">
+            <h2>Límites y Alertas</h2>
+            <p>Configure límites de transacciones y gestione sus alertas de seguridad</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- Sección de Límites -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">⚡</div>
+                    <h3>Límites de Transacciones</h3>
+                </div>
+                <div class="section-content">
+                    <div class="limit-item">
+                        <div class="limit-info">
+                            <div class="limit-label">Transferencias SINPE</div>
+                            <div class="limit-description">Límite diario para transferencias nacionales</div>
+                        </div>
+                        <div class="limit-value">₡500,000</div>
+                        <div class="limit-actions">
+                            <button class="btn btn-primary" onclick="editLimit('sinpe')">Editar</button>
+                        </div>
+                    </div>
+
+                    <div class="limit-item">
+                        <div class="limit-info">
+                            <div class="limit-label">Transferencias SWIFT</div>
+                            <div class="limit-description">Límite mensual para transferencias internacionales</div>
+                        </div>
+                        <div class="limit-value">$5,000</div>
+                        <div class="limit-actions">
+                            <button class="btn btn-primary" onclick="editLimit('swift')">Editar</button>
+                        </div>
+                    </div>
+
+                    <div class="limit-item">
+                        <div class="limit-info">
+                            <div class="limit-label">Compras con Tarjeta</div>
+                            <div class="limit-description">Límite diario para compras POS</div>
+                        </div>
+                        <div class="limit-value">₡300,000</div>
+                        <div class="limit-actions">
+                            <button class="btn btn-primary" onclick="editLimit('pos')">Editar</button>
+                        </div>
+                    </div>
+
+                    <div class="limit-item">
+                        <div class="limit-info">
+                            <div class="limit-label">Retiros ATM</div>
+                            <div class="limit-description">Límite diario para retiros en cajeros</div>
+                        </div>
+                        <div class="limit-value">₡150,000</div>
+                        <div class="limit-actions">
+                            <button class="btn btn-primary" onclick="editLimit('atm')">Editar</button>
+                        </div>
+                    </div>
+
+                    <div class="limit-item">
+                        <div class="limit-info">
+                            <div class="limit-label">Compras Online</div>
+                            <div class="limit-description">Límite mensual para compras en línea</div>
+                        </div>
+                        <div class="limit-value">₡200,000</div>
+                        <div class="limit-actions">
+                            <button class="btn btn-primary" onclick="editLimit('online')">Editar</button>
+                            <button class="btn btn-warning" onclick="toggleLimit('online')">Bloquear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Alertas -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">🔔</div>
+                    <h3>Alertas de Seguridad</h3>
+                </div>
+                <div class="section-content">
+                    <div class="alert-item alert-critical">
+                        <div class="alert-icon">🚨</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Transacción bloqueada</div>
+                            <div class="alert-description">Intento de transferencia por ₡800,000 - Excede límite diario</div>
+                        </div>
+                        <div class="alert-time">Hace 2 horas</div>
+                    </div>
+
+                    <div class="alert-item alert-warning">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Límite de tarjeta alcanzado</div>
+                            <div class="alert-description">Ha alcanzado el 90% del límite mensual de su tarjeta Visa</div>
+                        </div>
+                        <div class="alert-time">Hace 5 horas</div>
+                    </div>
+
+                    <div class="alert-item alert-info">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Nuevo dispositivo detectado</div>
+                            <div class="alert-description">Acceso desde un dispositivo no reconocido - Chrome/Windows</div>
+                        </div>
+                        <div class="alert-time">Ayer</div>
+                    </div>
+
+                    <div class="alert-item alert-warning">
+                        <div class="alert-icon">💳</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Compra rechazada</div>
+                            <div class="alert-description">Transacción por $250 rechazada - Comercio en lista restrictiva</div>
+                        </div>
+                        <div class="alert-time">Hace 2 días</div>
+                    </div>
+
+                    <div class="alert-item alert-info">
+                        <div class="alert-icon">📧</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Transferencia completada</div>
+                            <div class="alert-description">SINPE por ₡50,000 a CR05...789012 procesada exitosamente</div>
+                        </div>
+                        <div class="alert-time">Hace 3 días</div>
+                    </div>
+                </div>
+
+                <div class="notification-settings">
+                    <h4>Configuración de Notificaciones</h4>
+
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 600;">Notificaciones por Email</div>
+                            <div style="font-size: 0.9rem; color: #666;">Recibir alertas en su correo electrónico</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 600;">Notificaciones SMS</div>
+                            <div style="font-size: 0.9rem; color: #666;">Recibir alertas por mensaje de texto</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 600;">Alertas de Transacciones</div>
+                            <div style="font-size: 0.9rem; color: #666;">Notificar todas las transacciones</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 600;">Alertas de Seguridad</div>
+                            <div style="font-size: 0.9rem; color: #666;">Notificar actividades sospechosas</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar límites -->
+    <div id="limitModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLimitModal()">&times;</span>
+            <h3>Editar Límite de Transacción</h3>
+            <form id="limitForm" onsubmit="updateLimit(event)">
+                <div class="form-group">
+                    <label for="limitType">Tipo de Límite:</label>
+                    <input type="text" id="limitType" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="currentLimit">Límite Actual:</label>
+                    <input type="text" id="currentLimit" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="newLimit">Nuevo Límite:</label>
+                    <input type="number" id="newLimit" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="reason">Motivo del cambio:</label>
+                    <select id="reason" required>
+                        <option value="">Seleccione un motivo</option>
+                        <option value="increase_spending">Aumentar capacidad de gasto</option>
+                        <option value="security">Medida de seguridad</option>
+                        <option value="business">Necesidades comerciales</option>
+                        <option value="temporary">Cambio temporal</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Actualizar Límite</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentLimitType = '';
+
+        function editLimit(limitType) {
+            currentLimitType = limitType;
+            const limits = {
+                'sinpe': { name: 'Transferencias SINPE', current: '₡500,000' },
+                'swift': { name: 'Transferencias SWIFT', current: '$5,000' },
+                'pos': { name: 'Compras con Tarjeta', current: '₡300,000' },
+                'atm': { name: 'Retiros ATM', current: '₡150,000' },
+                'online': { name: 'Compras Online', current: '₡200,000' }
+            };
+
+            document.getElementById('limitType').value = limits[limitType].name;
+            document.getElementById('currentLimit').value = limits[limitType].current;
+            document.getElementById('newLimit').value = '';
+            document.getElementById('reason').value = '';
+
+            document.getElementById('limitModal').style.display = 'block';
+        }
+
+        function closeLimitModal() {
+            document.getElementById('limitModal').style.display = 'none';
+        }
+
+        function updateLimit(event) {
+            event.preventDefault();
+
+            const newLimit = document.getElementById('newLimit').value;
+            const reason = document.getElementById('reason').value;
+
+            if (!newLimit || !reason) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            alert(`Límite actualizado exitosamente. Los cambios pueden tardar hasta 24 horas en aplicarse.`);
+            closeLimitModal();
+
+            // Aquí se actualizaría la UI con el nuevo límite
+        }
+
+        function toggleLimit(limitType) {
+            if (confirm(`¿Está seguro que desea bloquear las ${limitType}?`)) {
+                alert(`${limitType} bloqueadas temporalmente. Puede reactivarlas cuando desee.`);
+            }
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('limitModal');
+            if (event.target === modal) {
+                closeLimitModal();
+            }
+        }
+
+        // Simular nuevas alertas cada 30 segundos
+        setInterval(() => {
+            console.log('Verificando nuevas alertas...');
+            // Aquí se verificarían nuevas alertas del servidor
+        }, 30000);
+    </script>
+</body>
+</html>

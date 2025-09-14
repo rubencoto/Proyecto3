@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión KYC - BancoSeguro Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .kyc-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .stat-card.pending::before {
+            background: #d69e2e;
+        }
+
+        .stat-card.approved::before {
+            background: #38a169;
+        }
+
+        .stat-card.rejected::before {
+            background: #e53e3e;
+        }
+
+        .stat-card.review::before {
+            background: #3182ce;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #d69e2e;
+        }
+
+        .stat-card.approved .stat-number {
+            color: #38a169;
+        }
+
+        .stat-card.rejected .stat-number {
+            color: #e53e3e;
+        }
+
+        .stat-card.review .stat-number {
+            color: #3182ce;
+        }
+
+        .stat-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .priority-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .priority-items {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .priority-high {
+            background: #fed7d7;
+            border-color: #e53e3e;
+        }
+
+        .priority-medium {
+            background: #fef5e7;
+            border-color: #d69e2e;
+        }
+
+        .priority-low {
+            background: #e6fffa;
+            border-color: #319795;
+        }
+
+        .priority-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .priority-content {
+            flex: 1;
+        }
+
+        .priority-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .priority-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .priority-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-info {
+            background: #3182ce;
+            color: white;
+        }
+
+        .kyc-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background: #fef5e7;
+            color: #744210;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-review {
+            background: #bee3f8;
+            color: #2a4365;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .risk-low {
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .risk-medium {
+            color: #d69e2e;
+            font-weight: bold;
+        }
+
+        .risk-high {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 95%;
+            max-width: 1200px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .kyc-review {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .document-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .document-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .doc-verified {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .doc-pending {
+            background: #fef5e7;
+            color: #744210;
+        }
+
+        .doc-rejected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .risk-assessment {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .risk-factors {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .risk-factor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .notes-section {
+            margin-top: 2rem;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 1rem;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-completed {
+            background: #38a169;
+            color: white;
+        }
+
+        .step-current {
+            background: #3182ce;
+            color: white;
+        }
+
+        .step-pending {
+            background: #e2e8f0;
+            color: #666;
+        }
+
+        .step-line {
+            width: 80px;
+            height: 2px;
+            background: #e2e8f0;
+            margin: 0 1rem;
+        }
+
+        .step-line.completed {
+            background: #38a169;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🏦 BancoSeguro</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="adminDashboard.html">Dashboard</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="cuentas.html">Cuentas</a>
+            <a href="gestionKyc.html" class="active">KYC</a>
+            <a href="../login.html">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h2>Gestión de Procesos KYC</h2>
+            <p>Administre los procesos de verificación de identidad y cumplimiento normativo</p>
+
+            <!-- Indicador de progreso general -->
+            <div class="progress-indicator">
+                <div class="progress-steps">
+                    <div class="progress-step">
+                        <div class="step-circle step-completed">📄</div>
+                        <small>Documentos</small>
+                    </div>
+                    <div class="step-line completed"></div>
+                    <div class="progress-step">
+                        <div class="step-circle step-current">🔍</div>
+                        <small>Verificación</small>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="progress-step">
+                        <div class="step-circle step-pending">⚖️</div>
+                        <small>Evaluación</small>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="progress-step">
+                        <div class="step-circle step-pending">✅</div>
+                        <small>Aprobación</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas KYC -->
+        <div class="kyc-stats">
+            <div class="stat-card pending">
+                <div class="stat-number">284</div>
+                <div class="stat-text">Pendientes</div>
+            </div>
+            <div class="stat-card review">
+                <div class="stat-number">67</div>
+                <div class="stat-text">En Revisión</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="stat-number">1,523</div>
+                <div class="stat-text">Aprobados</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="stat-number">45</div>
+                <div class="stat-text">Rechazados</div>
+            </div>
+        </div>
+
+        <!-- Casos de alta prioridad -->
+        <div class="priority-section">
+            <h3 style="margin-bottom: 1rem;">🚨 Casos de Alta Prioridad</h3>
+            <div class="priority-items">
+                <div class="priority-item priority-high">
+                    <div class="priority-icon">🔴</div>
+                    <div class="priority-content">
+                        <div class="priority-title">Cliente de Alto Riesgo - Ana Morales</div>
+                        <div class="priority-description">Documentos con inconsistencias detectadas. Requiere revisión manual inmediata.</div>
+                    </div>
+                    <div class="priority-actions">
+                        <button class="btn btn-danger" onclick="reviewKyc('CLI-1003')">Revisar</button>
+                    </div>
+                </div>
+
+                <div class="priority-item priority-medium">
+                    <div class="priority-icon">🟡</div>
+                    <div class="priority-content">
+                        <div class="priority-title">Vencimiento de Documentos - Roberto Vargas</div>
+                        <div class="priority-description">Los documentos vencen en 5 días. Solicitar actualización.</div>
+                    </div>
+                    <div class="priority-actions">
+                        <button class="btn btn-warning" onclick="requestUpdate('CLI-1004')">Solicitar</button>
+                    </div>
+                </div>
+
+                <div class="priority-item priority-low">
+                    <div class="priority-icon">🔵</div>
+                    <div class="priority-content">
+                        <div class="priority-title">Revisión Rutinaria - Carmen Solís</div>
+                        <div class="priority-description">Cliente nuevo con documentación completa lista para aprobación.</div>
+                    </div>
+                    <div class="priority-actions">
+                        <button class="btn btn-success" onclick="reviewKyc('CLI-1005')">Aprobar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <h3 style="margin-bottom: 1rem;">Filtros de Búsqueda</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="clientSearch">Cliente:</label>
+                    <input type="text" id="clientSearch" placeholder="Nombre o ID cliente">
+                </div>
+                <div class="form-group">
+                    <label for="statusKycFilter">Estado KYC:</label>
+                    <select id="statusKycFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="review">En Revisión</option>
+                        <option value="approved">Aprobado</option>
+                        <option value="rejected">Rechazado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="riskFilter">Nivel de Riesgo:</label>
+                    <select id="riskFilter">
+                        <option value="">Todos los niveles</option>
+                        <option value="low">Bajo</option>
+                        <option value="medium">Medio</option>
+                        <option value="high">Alto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dateKycFilter">Fecha de solicitud:</label>
+                    <select id="dateKycFilter">
+                        <option value="">Todas las fechas</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignedFilter">Asignado a:</label>
+                    <select id="assignedFilter">
+                        <option value="">Todos los analistas</option>
+                        <option value="analyst1">María González</option>
+                        <option value="analyst2">Carlos Mora</option>
+                        <option value="analyst3">Ana Jiménez</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="searchKyc()">🔍 Buscar</button>
+                        <button class="btn btn-warning" onclick="clearKycFilters()">🔄 Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla KYC -->
+        <div class="kyc-table">
+            <div class="table-header">
+                <h3>Casos KYC</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-info" onclick="exportKyc()">📊 Exportar</button>
+                    <button class="btn btn-primary" onclick="bulkAssign()">👥 Asignación Masiva</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" onchange="selectAllKyc(this)"></th>
+                        <th>Cliente</th>
+                        <th>ID Cliente</th>
+                        <th>Estado KYC</th>
+                        <th>Riesgo</th>
+                        <th>Documentos</th>
+                        <th>Fecha Solicitud</th>
+                        <th>Asignado a</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="kyc-check" value="CLI-1001"></td>
+                        <td><strong>María Rodríguez Jiménez</strong></td>
+                        <td>CLI-1001</td>
+                        <td><span class="status-approved">Aprobado</span></td>
+                        <td><span class="risk-low">Bajo</span></td>
+                        <td>✅ 6/6 Completos</td>
+                        <td>15/03/2024</td>
+                        <td>María González</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewKycDetails('CLI-1001')">👁️</button>
+                            <button class="action-btn btn-primary" onclick="downloadReport('CLI-1001')">📄</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="kyc-check" value="CLI-1002"></td>
+                        <td><strong>Juan Carlos Pérez Soto</strong></td>
+                        <td>CLI-1002</td>
+                        <td><span class="status-pending">Pendiente</span></td>
+                        <td><span class="risk-medium">Medio</span></td>
+                        <td>⚠️ 4/6 Pendientes</td>
+                        <td>22/03/2024</td>
+                        <td>Carlos Mora</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-warning" onclick="reviewKyc('CLI-1002')">🔍</button>
+                            <button class="action-btn btn-info" onclick="requestDocuments('CLI-1002')">📎</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="kyc-check" value="CLI-1003"></td>
+                        <td><strong>Ana Patricia Morales Vega</strong></td>
+                        <td>CLI-1003</td>
+                        <td><span class="status-review">En Revisión</span></td>
+                        <td><span class="risk-high">Alto</span></td>
+                        <td>❌ 3/6 Rechazados</td>
+                        <td>08/04/2024</td>
+                        <td>Ana Jiménez</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-danger" onclick="reviewKyc('CLI-1003')">🚨</button>
+                            <button class="action-btn btn-warning" onclick="escalateCase('CLI-1003')">⬆️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="kyc-check" value="CLI-1004"></td>
+                        <td><strong>Roberto Antonio Vargas López</strong></td>
+                        <td>CLI-1004</td>
+                        <td><span class="status-approved">Aprobado</span></td>
+                        <td><span class="risk-low">Bajo</span></td>
+                        <td>⚠️ 5/6 Vencen pronto</td>
+                        <td>12/04/2024</td>
+                        <td>María González</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-info" onclick="viewKycDetails('CLI-1004')">👁️</button>
+                            <button class="action-btn btn-warning" onclick="requestUpdate('CLI-1004')">🔄</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="kyc-check" value="CLI-1005"></td>
+                        <td><strong>Carmen Elena Solís Hernández</strong></td>
+                        <td>CLI-1005</td>
+                        <td><span class="status-pending">Pendiente</span></td>
+                        <td><span class="risk-low">Bajo</span></td>
+                        <td>✅ 6/6 Listos</td>
+                        <td>14/09/2025</td>
+                        <td>Carlos Mora</td>
+                        <td class="actions-cell">
+                            <button class="action-btn btn-success" onclick="reviewKyc('CLI-1005')">✅</button>
+                            <button class="action-btn btn-info" onclick="viewKycDetails('CLI-1005')">👁️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de revisión KYC -->
+    <div id="kycModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeKycModal()">&times;</span>
+            <h3>Revisión KYC - <span id="modalClientName"></span></h3>
+
+            <div class="kyc-review">
+                <div class="document-section">
+                    <h4>📄 Documentos Requeridos</h4>
+                    <div id="documentsContainer">
+                        <div class="document-item">
+                            <div>
+                                <strong>Cédula de Identidad</strong><br>
+                                <small>Vigente hasta: 15/08/2030</small>
+                            </div>
+                            <span class="document-status doc-verified">Verificado</span>
+                        </div>
+                        <div class="document-item">
+                            <div>
+                                <strong>Comprobante de Ingresos</strong><br>
+                                <small>Último mes: Agosto 2025</small>
+                            </div>
+                            <span class="document-status doc-verified">Verificado</span>
+                        </div>
+                        <div class="document-item">
+                            <div>
+                                <strong>Referencias Comerciales</strong><br>
+                                <small>2 referencias requeridas</small>
+                            </div>
+                            <span class="document-status doc-pending">Pendiente</span>
+                        </div>
+                        <div class="document-item">
+                            <div>
+                                <strong>Comprobante de Domicilio</strong><br>
+                                <small>No mayor a 3 meses</small>
+                            </div>
+                            <span class="document-status doc-rejected">Rechazado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="risk-assessment">
+                    <h4>⚖️ Evaluación de Riesgo</h4>
+                    <div class="risk-factors">
+                        <div class="risk-factor">
+                            <span>Origen de Fondos</span>
+                            <span class="risk-low">✅ Verificado</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span>Actividad Económica</span>
+                            <span class="risk-low">✅ Normal</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span>Ubicación Geográfica</span>
+                            <span class="risk-medium">⚠️ Zona Media</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span>Historial Crediticio</span>
+                            <span class="risk-low">✅ Excelente</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span>Listas Restrictivas</span>
+                            <span class="risk-low">✅ Sin coincidencias</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding: 1rem; background: #f0f8ff; border-radius: 8px;">
+                        <strong>Puntuación de Riesgo: 25/100</strong><br>
+                        <small>Clasificación: <span class="risk-low">RIESGO BAJO</span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-section">
+                <h4>📝 Notas del Analista</h4>
+                <textarea class="notes-textarea" placeholder="Agregue sus observaciones y recomendaciones..."></textarea>
+            </div>
+
+            <div class="review-actions">
+                <button class="btn btn-success" onclick="approveKyc()">✅ Aprobar</button>
+                <button class="btn btn-warning" onclick="requestMoreInfo()">📎 Solicitar Información</button>
+                <button class="btn btn-danger" onclick="rejectKyc()">❌ Rechazar</button>
+                <button class="btn btn-info" onclick="escalateToSupervisor()">⬆️ Escalar a Supervisor</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchKyc() {
+            const clientSearch = document.getElementById('clientSearch').value;
+            alert(`Buscando casos KYC: "${clientSearch}"`);
+        }
+
+        function clearKycFilters() {
+            document.getElementById('clientSearch').value = '';
+            document.getElementById('statusKycFilter').value = '';
+            document.getElementById('riskFilter').value = '';
+            document.getElementById('dateKycFilter').value = '';
+            document.getElementById('assignedFilter').value = '';
+            alert('Filtros limpiados');
+        }
+
+        function reviewKyc(clientId) {
+            document.getElementById('modalClientName').textContent = getClientName(clientId);
+            document.getElementById('kycModal').style.display = 'block';
+        }
+
+        function closeKycModal() {
+            document.getElementById('kycModal').style.display = 'none';
+        }
+
+        function viewKycDetails(clientId) {
+            alert(`Viendo detalles completos del KYC para: ${clientId}`);
+        }
+
+        function requestDocuments(clientId) {
+            if (confirm(`¿Solicitar documentos faltantes al cliente ${clientId}?`)) {
+                alert(`Solicitud enviada al cliente ${clientId}`);
+            }
+        }
+
+        function escalateCase(clientId) {
+            if (confirm(`¿Escalar el caso ${clientId} al supervisor?`)) {
+                const reason = prompt('Motivo de escalamiento:');
+                if (reason) {
+                    alert(`Caso ${clientId} escalado. Motivo: ${reason}`);
+                }
+            }
+        }
+
+        function requestUpdate(clientId) {
+            if (confirm(`¿Solicitar actualización de documentos al cliente ${clientId}?`)) {
+                alert(`Solicitud de actualización enviada a ${clientId}`);
+            }
+        }
+
+        function downloadReport(clientId) {
+            alert(`Descargando reporte KYC completo para: ${clientId}`);
+        }
+
+        function approveKyc() {
+            if (confirm('¿Está seguro de aprobar este proceso KYC?')) {
+                alert('Proceso KYC aprobado exitosamente');
+                closeKycModal();
+            }
+        }
+
+        function requestMoreInfo() {
+            const info = prompt('¿Qué información adicional requiere?');
+            if (info) {
+                alert(`Solicitud enviada: ${info}`);
+                closeKycModal();
+            }
+        }
+
+        function rejectKyc() {
+            if (confirm('¿Está seguro de rechazar este proceso KYC?')) {
+                const reason = prompt('Motivo del rechazo:');
+                if (reason) {
+                    alert(`Proceso KYC rechazado. Motivo: ${reason}`);
+                    closeKycModal();
+                }
+            }
+        }
+
+        function escalateToSupervisor() {
+            const reason = prompt('Motivo de escalamiento al supervisor:');
+            if (reason) {
+                alert(`Caso escalado al supervisor. Motivo: ${reason}`);
+                closeKycModal();
+            }
+        }
+
+        function selectAllKyc(checkbox) {
+            const checkboxes = document.querySelectorAll('.kyc-check');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function exportKyc() {
+            alert('Exportando reportes KYC...');
+        }
+
+        function bulkAssign() {
+            const selected = document.querySelectorAll('.kyc-check:checked');
+            if (selected.length === 0) {
+                alert('Seleccione al menos un caso KYC');
+                return;
+            }
+
+            const analyst = prompt('Asignar casos a (nombre del analista):');
+            if (analyst) {
+                alert(`${selected.length} casos asignados a ${analyst}`);
+            }
+        }
+
+        function getClientName(clientId) {
+            const names = {
+                'CLI-1001': 'María Rodríguez Jiménez',
+                'CLI-1002': 'Juan Carlos Pérez Soto',
+                'CLI-1003': 'Ana Patricia Morales Vega',
+                'CLI-1004': 'Roberto Antonio Vargas López',
+                'CLI-1005': 'Carmen Elena Solís Hernández'
+            };
+            return names[clientId] || 'Cliente Desconocido';
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('kycModal');
+            if (event.target === modal) {
+                closeKycModal();
+            }
+        }
+
+        // Simulación de notificaciones en tiempo real
+        setTimeout(() => {
+            if (confirm('🚨 Nuevo caso KYC de alto riesgo detectado. ¿Desea revisar inmediatamente?')) {
+                alert('Redirigiendo a caso de alta prioridad...');
+            }
+        }, 15000);
+    </script>
+</body>
+</html>
